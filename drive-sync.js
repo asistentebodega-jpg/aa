@@ -919,10 +919,12 @@ function _renderCarrierPanel() {
     const active = _state.activeLabelSource || 'mercadolibre';
     const isCarrier = active !== 'mercadolibre';
     const source = _getSourceConfig(active);
+    const results = document.getElementById('results');
     const table = document.querySelector('#results .table-container');
     const panel = document.getElementById('carrierLabelsPanel');
     const pdfPrinter = document.getElementById('pdfLabelPrinter');
 
+    if (results) results.classList.toggle('is-carrier-label-mode', isCarrier);
     if (table) table.classList.toggle('is-hidden', isCarrier);
     if (panel) panel.classList.toggle('is-hidden', !isCarrier);
     if (pdfPrinter) pdfPrinter.classList.toggle('is-hidden', !isCarrier);
@@ -974,9 +976,14 @@ function _renderCarrierPanel() {
                 </td>
                 <td>${_carrierPrintStatusHtml(active, file.id)}</td>
                 <td>
-                    <button class="carrier-open-btn" type="button"
-                        data-carrier-source="${_esc(active)}"
-                        data-carrier-file-id="${_esc(file.id)}">${_getCarrierPrintedInfo(active, file.id) ? 'Reimprimir' : 'Imprimir'}</button>
+                    <div class="carrier-row-actions">
+                        <button class="carrier-preview-btn" type="button"
+                            data-carrier-preview-source="${_esc(active)}"
+                            data-carrier-preview-file-id="${_esc(file.id)}">Visualizar</button>
+                        <button class="carrier-open-btn" type="button"
+                            data-carrier-source="${_esc(active)}"
+                            data-carrier-file-id="${_esc(file.id)}">${_getCarrierPrintedInfo(active, file.id) ? 'Reimprimir' : 'Imprimir'}</button>
+                    </div>
                 </td>
             </tr>
         `;
@@ -1051,6 +1058,48 @@ async function _printCarrierFileToZebra(sourceKey, fileId, button) {
     }
 }
 
+async function _previewCarrierFile(sourceKey, fileId, button) {
+    const source = _getSourceConfig(sourceKey);
+    const file = (_state.carrierFiles[source.key] || []).find(item => item.id === fileId);
+    if (!file?.id) {
+        _setToast('No se pudo encontrar el PDF de Drive.', false);
+        return;
+    }
+
+    const originalText = button?.textContent || 'Visualizar';
+    if (button) {
+        button.disabled = true;
+        button.textContent = 'Cargando...';
+    }
+
+    try {
+        _setToast(`Preparando vista de ${file.name || `Etiqueta ${source.label}`}...`);
+        const blob = await _downloadDriveBlob(file.id, 'application/pdf');
+        const date = _formatDriveDate(file.createdTime || file.modifiedTime) || 'Sin fecha';
+        const time = _formatDriveTime(file.createdTime || file.modifiedTime) || '';
+        const folder = file.folder || source.folder;
+
+        _showCarrierPrintModal(source, [{
+            sourceKey: source.key,
+            id: file.id,
+            name: file.name || `Etiqueta ${source.label}`,
+            meta: [folder, date, time].filter(Boolean).join(' - '),
+            url: URL.createObjectURL(blob),
+            blob,
+            printedInfo: _getCarrierPrintedInfo(source.key, file.id),
+        }]);
+        _setToast(`${file.name || `Etiqueta ${source.label}`} lista para visualizar.`);
+    } catch (err) {
+        console.warn('[DriveSync] previewCarrierFile:', err);
+        _setToast(err?.message || 'No se pudo visualizar el PDF de Drive.', false);
+    } finally {
+        if (button?.isConnected) {
+            button.disabled = false;
+            button.textContent = originalText;
+        }
+    }
+}
+
 function _cleanupCarrierPrintEntries() {
     for (const entry of _carrierPrintState.entries) {
         if (entry?.url) URL.revokeObjectURL(entry.url);
@@ -1090,7 +1139,7 @@ function _ensureCarrierPrintModal() {
             </div>
             <footer class="carrier-print-actions">
                 <button class="carrier-print-secondary" type="button" data-carrier-print-close>Cerrar</button>
-                <button class="carrier-print-primary" id="carrierPrintPrintBtn" type="button">Imprimir PDF</button>
+                <button class="carrier-print-primary" id="carrierPrintPrintBtn" type="button">Imprimir en Zebra</button>
             </footer>
         </section>
     `;
@@ -1204,13 +1253,13 @@ function _setCarrierPrintActiveIndex(index) {
     }
     if (printBtn) {
         printBtn.disabled = false;
-        printBtn.textContent = printedInfo ? 'Reimprimir PDF' : 'Imprimir PDF';
+        printBtn.textContent = printedInfo ? 'Reimprimir en Zebra' : 'Imprimir en Zebra';
         printBtn.classList.toggle('is-reprint', !!printedInfo);
     }
     if (meta) {
         meta.textContent = printedInfo
             ? `Esta etiqueta ya fue marcada como impresa: ${_carrierPrintStatusText(printedInfo)}.`
-            : `${entries.length} PDF(s) listo(s). Revisa el cuadre y presiona Imprimir PDF.`;
+            : `${entries.length} PDF(s) listo(s). Visualiza la etiqueta y presiona Imprimir en Zebra.`;
     }
 
     modal.querySelectorAll('[data-carrier-print-index]').forEach(button => {
@@ -1229,7 +1278,7 @@ function _showCarrierPrintModal(source, entries) {
 
     modal.querySelector('#carrierPrintKicker').textContent = source.label;
     modal.querySelector('#carrierPrintTitle').textContent = `Etiquetas ${source.label}`;
-    modal.querySelector('#carrierPrintMeta').textContent = `${entries.length} PDF(s) listo(s). Revisa el cuadre y presiona Imprimir PDF.`;
+    modal.querySelector('#carrierPrintMeta').textContent = `${entries.length} PDF(s) listo(s). Visualiza la etiqueta y presiona Imprimir en Zebra.`;
 
     const select = modal.querySelector('#carrierPrintSelect');
     const list = modal.querySelector('#carrierPrintFileList');
@@ -1264,13 +1313,12 @@ function _showCarrierPrintModal(source, entries) {
     modal.querySelector('#carrierPrintPrintBtn')?.focus();
 }
 
-function _printCurrentCarrierPdf() {
+async function _printCurrentCarrierPdf() {
     const modal = _ensureCarrierPrintModal();
-    const frame = modal.querySelector('#carrierPrintFrame');
     const button = modal.querySelector('#carrierPrintPrintBtn');
     const entry = _carrierPrintState.entries[_carrierPrintState.activeIndex];
 
-    if (!frame?.src) {
+    if (!entry?.id) {
         _setToast('Selecciona un PDF para imprimir.', false);
         return;
     }
@@ -1282,46 +1330,45 @@ function _printCurrentCarrierPdf() {
         if (!ok) return;
     }
 
-    const originalText = button?.textContent || 'Imprimir PDF';
-    if (button) {
-        button.disabled = true;
-        button.textContent = 'Preparando impresion...';
+    const app = window.App;
+    if (!app?.pdfLabels?.printPdfBlob) {
+        _setToast('El impresor PDF Zebra no esta disponible. Recarga la pagina.', false);
+        return;
     }
 
-    const runPrint = () => {
-        try {
-            frame.contentWindow?.focus();
-            frame.contentWindow?.print();
-            if (entry) {
-                entry.printedInfo = _markCarrierPrinted(entry);
-                _renderCarrierPanel();
-                _syncCarrierPrintStatusUi();
-                const meta = modal.querySelector('#carrierPrintMeta');
-                if (meta) {
-                    meta.textContent = `Esta etiqueta ya fue marcada como impresa: ${_carrierPrintStatusText(entry.printedInfo)}.`;
-                }
-                if (button) {
-                    button.textContent = 'Reimprimir PDF';
-                    button.classList.add('is-reprint');
-                }
-            }
-            _setToast(printedInfo ? 'Etiqueta marcada como reimpresa.' : 'Etiqueta marcada como impresa.');
-        } catch (err) {
-            console.warn('[DriveSync] print current PDF:', err);
-            _setToast('No se pudo abrir el dialogo de impresion del PDF.', false);
-        } finally {
-            if (button) {
-                const currentPrinted = entry ? _getCarrierPrintedInfo(entry.sourceKey, entry.id) : null;
-                button.textContent = currentPrinted ? 'Reimprimir PDF' : originalText;
-                button.disabled = false;
-            }
-        }
-    };
+    const originalText = button?.textContent || 'Imprimir en Zebra';
+    if (button) {
+        button.disabled = true;
+        button.textContent = 'Imprimiendo...';
+    }
 
-    if (frame.dataset.loaded === '1') {
-        window.setTimeout(runPrint, 150);
-    } else {
-        frame.addEventListener('load', () => window.setTimeout(runPrint, 250), { once: true });
+    try {
+        const blob = entry.blob || await _downloadDriveBlob(entry.id, 'application/pdf');
+        entry.blob = blob;
+        const result = await app.pdfLabels.printPdfBlob(blob, entry.name, {
+            onProgress: message => _setToast(message)
+        });
+        entry.printedInfo = _markCarrierPrinted(entry);
+        _renderCarrierPanel();
+        _syncCarrierPrintStatusUi();
+        const meta = modal.querySelector('#carrierPrintMeta');
+        if (meta) {
+            meta.textContent = `Esta etiqueta ya fue marcada como impresa: ${_carrierPrintStatusText(entry.printedInfo)}.`;
+        }
+        if (button) {
+            button.textContent = 'Reimprimir en Zebra';
+            button.classList.add('is-reprint');
+        }
+        _setToast(`${entry.name} enviada a ${result.printer}.`);
+    } catch (err) {
+        console.warn('[DriveSync] print current carrier PDF:', err);
+        _setToast(err?.message || 'No se pudo imprimir el PDF de Drive en Zebra.', false);
+    } finally {
+        if (button) {
+            const currentPrinted = _getCarrierPrintedInfo(entry.sourceKey, entry.id);
+            button.textContent = currentPrinted ? 'Reimprimir en Zebra' : originalText;
+            button.disabled = false;
+        }
     }
 }
 
@@ -1416,6 +1463,17 @@ function _initCarrierLabelsUi() {
     if (!results) return;
 
     results.addEventListener('click', event => {
+        const previewBtn = event.target.closest('[data-carrier-preview-file-id]');
+        if (previewBtn) {
+            event.preventDefault();
+            _previewCarrierFile(
+                previewBtn.dataset.carrierPreviewSource,
+                previewBtn.dataset.carrierPreviewFileId,
+                previewBtn
+            );
+            return;
+        }
+
         const openBtn = event.target.closest('[data-carrier-file-id]');
         if (openBtn) {
             event.preventDefault();

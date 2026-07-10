@@ -1623,9 +1623,11 @@
 
         .table-container {
             order: 4;
-            align-self: start;
-            max-height: 250px;
-            overflow-y: auto;
+            align-self: stretch;
+            height: 100%;
+            min-height: 0;
+            max-height: none;
+            overflow: auto;
             margin-bottom: 0;
             border: 1px solid var(--border);
             border-radius: var(--radius-md);
@@ -1634,10 +1636,11 @@
 
         .carrier-labels-panel {
             order: 4;
-            align-self: start;
+            align-self: stretch;
             display: grid;
             grid-template-rows: auto minmax(0, 1fr);
-            min-height: 250px;
+            height: 100%;
+            min-height: 0;
             border: 1px solid var(--border);
             border-radius: var(--radius-md);
             background: rgba(255, 255, 255, 0.9);
@@ -1671,6 +1674,7 @@
         }
 
         .carrier-refresh-btn,
+        .carrier-preview-btn,
         .carrier-open-btn {
             appearance: none;
             border: 1px solid var(--border);
@@ -1693,11 +1697,33 @@
             height: 28px;
         }
 
+        .carrier-preview-btn {
+            width: 92px;
+            height: 28px;
+            color: #0B57D0;
+            border-color: rgba(11, 87, 208, 0.18);
+            background: rgba(11, 87, 208, 0.05);
+        }
+
+        .carrier-row-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+        }
+
         .carrier-refresh-btn:hover,
+        .carrier-preview-btn:hover,
         .carrier-open-btn:hover {
             border-color: rgba(0, 179, 77, 0.28);
             color: var(--primary-dark);
             background: rgba(0, 179, 77, 0.06);
+        }
+
+        .carrier-preview-btn:disabled,
+        .carrier-open-btn:disabled {
+            cursor: wait;
+            opacity: 0.58;
         }
 
         .carrier-labels-table-wrap {
@@ -2048,6 +2074,222 @@
             display: none;
         }
 
+        .panel-main.is-carrier-label-mode .results-shell {
+            grid-template-rows: auto auto auto minmax(0, 1fr) !important;
+        }
+
+        .panel-main.is-carrier-label-mode .results-actions {
+            display: none !important;
+        }
+
+        .carrier-print-lock {
+            overflow: hidden;
+        }
+
+        .carrier-print-modal[hidden] {
+            display: none;
+        }
+
+        .carrier-print-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 3000;
+            display: grid;
+            place-items: center;
+            padding: 22px;
+        }
+
+        .carrier-print-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.42);
+            backdrop-filter: blur(2px);
+        }
+
+        .carrier-print-dialog {
+            position: relative;
+            z-index: 1;
+            width: min(1120px, calc(100vw - 36px));
+            height: min(740px, calc(100vh - 36px));
+            min-height: 0;
+            display: grid;
+            grid-template-rows: auto minmax(0, 1fr) auto;
+            overflow: hidden;
+            border: 1px solid rgba(15, 23, 42, 0.12);
+            border-radius: 12px;
+            background: #fff;
+            box-shadow: 0 24px 70px rgba(15, 23, 42, 0.24);
+        }
+
+        .carrier-print-head,
+        .carrier-print-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.8rem;
+            padding: 0.9rem 1rem;
+            border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+        }
+
+        .carrier-print-actions {
+            justify-content: flex-end;
+            border-top: 1px solid rgba(15, 23, 42, 0.08);
+            border-bottom: 0;
+        }
+
+        .carrier-print-kicker,
+        .carrier-print-head p,
+        .carrier-print-side label {
+            color: var(--text-muted);
+            font-size: 0.72rem;
+            font-weight: 800;
+        }
+
+        .carrier-print-head h2 {
+            margin: 0.1rem 0;
+            color: var(--text);
+            font-size: 1rem;
+        }
+
+        .carrier-print-head p {
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .carrier-print-close,
+        .carrier-print-secondary,
+        .carrier-print-primary {
+            appearance: none;
+            min-height: 34px;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            padding: 0 0.85rem;
+            font: inherit;
+            font-size: 0.78rem;
+            font-weight: 850;
+            cursor: pointer;
+        }
+
+        .carrier-print-close {
+            width: 34px;
+            padding: 0;
+            background: #fff;
+            color: var(--text-muted);
+        }
+
+        .carrier-print-secondary {
+            background: #fff;
+            color: var(--text);
+        }
+
+        .carrier-print-primary {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+        }
+
+        .carrier-print-primary:disabled {
+            cursor: not-allowed;
+            opacity: 0.55;
+        }
+
+        .carrier-print-body {
+            min-height: 0;
+            display: grid;
+            grid-template-columns: 265px minmax(0, 1fr);
+            background: rgba(248, 251, 248, 0.72);
+        }
+
+        .carrier-print-side {
+            min-height: 0;
+            display: grid;
+            grid-template-rows: auto auto minmax(0, 1fr);
+            gap: 0.65rem;
+            padding: 0.85rem;
+            border-right: 1px solid rgba(15, 23, 42, 0.08);
+            overflow: auto;
+        }
+
+        .carrier-print-side select {
+            width: 100%;
+            height: 34px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #fff;
+            color: var(--text);
+            font-size: 0.76rem;
+            font-weight: 800;
+            padding: 0 0.6rem;
+        }
+
+        .carrier-print-file-list {
+            min-height: 0;
+            display: grid;
+            align-content: start;
+            gap: 0.55rem;
+        }
+
+        .carrier-print-file,
+        .carrier-print-empty {
+            min-width: 0;
+            display: grid;
+            gap: 0.25rem;
+            border: 1px solid rgba(15, 23, 42, 0.1);
+            border-radius: 10px;
+            background: #fff;
+            padding: 0.65rem;
+            text-align: left;
+        }
+
+        .carrier-print-file {
+            cursor: pointer;
+        }
+
+        .carrier-print-file.is-active {
+            border-color: rgba(0, 179, 77, 0.38);
+            background: rgba(0, 179, 77, 0.06);
+        }
+
+        .carrier-print-file strong {
+            color: var(--text);
+            font-size: 0.78rem;
+            overflow-wrap: anywhere;
+        }
+
+        .carrier-print-file-meta,
+        .carrier-print-file-status,
+        .carrier-print-empty {
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            font-weight: 750;
+        }
+
+        .carrier-print-file-status.is-printed {
+            color: var(--success);
+        }
+
+        .carrier-print-file-status.is-pending {
+            color: #8A5A00;
+        }
+
+        .carrier-print-empty.is-error {
+            color: var(--error);
+        }
+
+        .carrier-print-viewer {
+            min-width: 0;
+            min-height: 0;
+            padding: 0.85rem;
+        }
+
+        .carrier-print-viewer iframe {
+            width: 100%;
+            height: 100%;
+            border: 1px solid rgba(15, 23, 42, 0.1);
+            border-radius: 10px;
+            background: #fff;
+        }
+
         body.is-dark-mode .pdf-label-printer,
         body.is-dark-mode .pdf-label-card,
         body.is-dark-mode .pdf-label-width-control,
@@ -2065,6 +2307,33 @@
             background: rgba(30, 41, 59, 0.72);
             border-color: rgba(148, 163, 184, 0.22);
             color: #C7D6EA;
+        }
+
+        body.is-dark-mode .carrier-print-dialog,
+        body.is-dark-mode .carrier-print-close,
+        body.is-dark-mode .carrier-print-secondary,
+        body.is-dark-mode .carrier-print-side select,
+        body.is-dark-mode .carrier-print-file,
+        body.is-dark-mode .carrier-print-empty {
+            background: #101A2C;
+            border-color: rgba(148, 163, 184, 0.24);
+            color: #F4F8FF;
+        }
+
+        body.is-dark-mode .carrier-print-body,
+        body.is-dark-mode .carrier-print-viewer {
+            background: #0B1220;
+        }
+
+        body.is-dark-mode .carrier-print-head,
+        body.is-dark-mode .carrier-print-actions,
+        body.is-dark-mode .carrier-print-side {
+            border-color: rgba(148, 163, 184, 0.22);
+        }
+
+        body.is-dark-mode .carrier-print-head h2,
+        body.is-dark-mode .carrier-print-file strong {
+            color: #F4F8FF;
         }
 
         body.is-dark-mode .pdf-label-head strong,
@@ -2213,7 +2482,7 @@
         }
 
         .results-actions {
-            order: 6;
+            order: 5;
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: var(--space-4);
@@ -2725,7 +2994,7 @@
                 height: 100%;
                 min-height: 0;
                 display: grid;
-                grid-template-rows: auto auto auto auto minmax(0, 1fr) auto;
+                grid-template-rows: auto auto auto minmax(0, 1fr) auto;
                 gap: 0.7rem;
             }
 
@@ -3255,7 +3524,7 @@ body.is-dark-mode #cancelOrderBtn:disabled {
 
 /* Panel seleccionable de estados de pedidos */
 .results-shell {
-  grid-template-rows: auto auto auto auto auto 46px !important;
+  grid-template-rows: auto auto auto minmax(0, 1fr) 46px !important;
 }
 
 .stats {

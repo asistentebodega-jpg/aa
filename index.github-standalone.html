@@ -1634,9 +1634,11 @@
 
         .table-container {
             order: 4;
-            align-self: start;
-            max-height: 250px;
-            overflow-y: auto;
+            align-self: stretch;
+            height: 100%;
+            min-height: 0;
+            max-height: none;
+            overflow: auto;
             margin-bottom: 0;
             border: 1px solid var(--border);
             border-radius: var(--radius-md);
@@ -1645,10 +1647,11 @@
 
         .carrier-labels-panel {
             order: 4;
-            align-self: start;
+            align-self: stretch;
             display: grid;
             grid-template-rows: auto minmax(0, 1fr);
-            min-height: 250px;
+            height: 100%;
+            min-height: 0;
             border: 1px solid var(--border);
             border-radius: var(--radius-md);
             background: rgba(255, 255, 255, 0.9);
@@ -1682,6 +1685,7 @@
         }
 
         .carrier-refresh-btn,
+        .carrier-preview-btn,
         .carrier-open-btn {
             appearance: none;
             border: 1px solid var(--border);
@@ -1704,11 +1708,33 @@
             height: 28px;
         }
 
+        .carrier-preview-btn {
+            width: 92px;
+            height: 28px;
+            color: #0B57D0;
+            border-color: rgba(11, 87, 208, 0.18);
+            background: rgba(11, 87, 208, 0.05);
+        }
+
+        .carrier-row-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+        }
+
         .carrier-refresh-btn:hover,
+        .carrier-preview-btn:hover,
         .carrier-open-btn:hover {
             border-color: rgba(0, 179, 77, 0.28);
             color: var(--primary-dark);
             background: rgba(0, 179, 77, 0.06);
+        }
+
+        .carrier-preview-btn:disabled,
+        .carrier-open-btn:disabled {
+            cursor: wait;
+            opacity: 0.58;
         }
 
         .carrier-labels-table-wrap {
@@ -2059,6 +2085,222 @@
             display: none;
         }
 
+        .panel-main.is-carrier-label-mode .results-shell {
+            grid-template-rows: auto auto auto minmax(0, 1fr) !important;
+        }
+
+        .panel-main.is-carrier-label-mode .results-actions {
+            display: none !important;
+        }
+
+        .carrier-print-lock {
+            overflow: hidden;
+        }
+
+        .carrier-print-modal[hidden] {
+            display: none;
+        }
+
+        .carrier-print-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 3000;
+            display: grid;
+            place-items: center;
+            padding: 22px;
+        }
+
+        .carrier-print-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.42);
+            backdrop-filter: blur(2px);
+        }
+
+        .carrier-print-dialog {
+            position: relative;
+            z-index: 1;
+            width: min(1120px, calc(100vw - 36px));
+            height: min(740px, calc(100vh - 36px));
+            min-height: 0;
+            display: grid;
+            grid-template-rows: auto minmax(0, 1fr) auto;
+            overflow: hidden;
+            border: 1px solid rgba(15, 23, 42, 0.12);
+            border-radius: 12px;
+            background: #fff;
+            box-shadow: 0 24px 70px rgba(15, 23, 42, 0.24);
+        }
+
+        .carrier-print-head,
+        .carrier-print-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.8rem;
+            padding: 0.9rem 1rem;
+            border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+        }
+
+        .carrier-print-actions {
+            justify-content: flex-end;
+            border-top: 1px solid rgba(15, 23, 42, 0.08);
+            border-bottom: 0;
+        }
+
+        .carrier-print-kicker,
+        .carrier-print-head p,
+        .carrier-print-side label {
+            color: var(--text-muted);
+            font-size: 0.72rem;
+            font-weight: 800;
+        }
+
+        .carrier-print-head h2 {
+            margin: 0.1rem 0;
+            color: var(--text);
+            font-size: 1rem;
+        }
+
+        .carrier-print-head p {
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .carrier-print-close,
+        .carrier-print-secondary,
+        .carrier-print-primary {
+            appearance: none;
+            min-height: 34px;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            padding: 0 0.85rem;
+            font: inherit;
+            font-size: 0.78rem;
+            font-weight: 850;
+            cursor: pointer;
+        }
+
+        .carrier-print-close {
+            width: 34px;
+            padding: 0;
+            background: #fff;
+            color: var(--text-muted);
+        }
+
+        .carrier-print-secondary {
+            background: #fff;
+            color: var(--text);
+        }
+
+        .carrier-print-primary {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+        }
+
+        .carrier-print-primary:disabled {
+            cursor: not-allowed;
+            opacity: 0.55;
+        }
+
+        .carrier-print-body {
+            min-height: 0;
+            display: grid;
+            grid-template-columns: 265px minmax(0, 1fr);
+            background: rgba(248, 251, 248, 0.72);
+        }
+
+        .carrier-print-side {
+            min-height: 0;
+            display: grid;
+            grid-template-rows: auto auto minmax(0, 1fr);
+            gap: 0.65rem;
+            padding: 0.85rem;
+            border-right: 1px solid rgba(15, 23, 42, 0.08);
+            overflow: auto;
+        }
+
+        .carrier-print-side select {
+            width: 100%;
+            height: 34px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #fff;
+            color: var(--text);
+            font-size: 0.76rem;
+            font-weight: 800;
+            padding: 0 0.6rem;
+        }
+
+        .carrier-print-file-list {
+            min-height: 0;
+            display: grid;
+            align-content: start;
+            gap: 0.55rem;
+        }
+
+        .carrier-print-file,
+        .carrier-print-empty {
+            min-width: 0;
+            display: grid;
+            gap: 0.25rem;
+            border: 1px solid rgba(15, 23, 42, 0.1);
+            border-radius: 10px;
+            background: #fff;
+            padding: 0.65rem;
+            text-align: left;
+        }
+
+        .carrier-print-file {
+            cursor: pointer;
+        }
+
+        .carrier-print-file.is-active {
+            border-color: rgba(0, 179, 77, 0.38);
+            background: rgba(0, 179, 77, 0.06);
+        }
+
+        .carrier-print-file strong {
+            color: var(--text);
+            font-size: 0.78rem;
+            overflow-wrap: anywhere;
+        }
+
+        .carrier-print-file-meta,
+        .carrier-print-file-status,
+        .carrier-print-empty {
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            font-weight: 750;
+        }
+
+        .carrier-print-file-status.is-printed {
+            color: var(--success);
+        }
+
+        .carrier-print-file-status.is-pending {
+            color: #8A5A00;
+        }
+
+        .carrier-print-empty.is-error {
+            color: var(--error);
+        }
+
+        .carrier-print-viewer {
+            min-width: 0;
+            min-height: 0;
+            padding: 0.85rem;
+        }
+
+        .carrier-print-viewer iframe {
+            width: 100%;
+            height: 100%;
+            border: 1px solid rgba(15, 23, 42, 0.1);
+            border-radius: 10px;
+            background: #fff;
+        }
+
         body.is-dark-mode .pdf-label-printer,
         body.is-dark-mode .pdf-label-card,
         body.is-dark-mode .pdf-label-width-control,
@@ -2076,6 +2318,33 @@
             background: rgba(30, 41, 59, 0.72);
             border-color: rgba(148, 163, 184, 0.22);
             color: #C7D6EA;
+        }
+
+        body.is-dark-mode .carrier-print-dialog,
+        body.is-dark-mode .carrier-print-close,
+        body.is-dark-mode .carrier-print-secondary,
+        body.is-dark-mode .carrier-print-side select,
+        body.is-dark-mode .carrier-print-file,
+        body.is-dark-mode .carrier-print-empty {
+            background: #101A2C;
+            border-color: rgba(148, 163, 184, 0.24);
+            color: #F4F8FF;
+        }
+
+        body.is-dark-mode .carrier-print-body,
+        body.is-dark-mode .carrier-print-viewer {
+            background: #0B1220;
+        }
+
+        body.is-dark-mode .carrier-print-head,
+        body.is-dark-mode .carrier-print-actions,
+        body.is-dark-mode .carrier-print-side {
+            border-color: rgba(148, 163, 184, 0.22);
+        }
+
+        body.is-dark-mode .carrier-print-head h2,
+        body.is-dark-mode .carrier-print-file strong {
+            color: #F4F8FF;
         }
 
         body.is-dark-mode .pdf-label-head strong,
@@ -2224,7 +2493,7 @@
         }
 
         .results-actions {
-            order: 6;
+            order: 5;
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: var(--space-4);
@@ -2736,7 +3005,7 @@
                 height: 100%;
                 min-height: 0;
                 display: grid;
-                grid-template-rows: auto auto auto auto minmax(0, 1fr) auto;
+                grid-template-rows: auto auto auto minmax(0, 1fr) auto;
                 gap: 0.7rem;
             }
 
@@ -3266,7 +3535,7 @@ body.is-dark-mode #cancelOrderBtn:disabled {
 
 /* Panel seleccionable de estados de pedidos */
 .results-shell {
-  grid-template-rows: auto auto auto auto auto 46px !important;
+  grid-template-rows: auto auto auto minmax(0, 1fr) 46px !important;
 }
 
 .stats {
@@ -5351,7 +5620,7 @@ header p {
   height: 100% !important;
   min-height: 0 !important;
   display: grid !important;
-  grid-template-rows: 92px auto auto auto auto 46px !important;
+  grid-template-rows: auto auto auto minmax(0, 1fr) 46px !important;
   gap: 10px !important;
 }
 
@@ -5853,8 +6122,8 @@ header p {
 .table-container,
 .carrier-labels-panel {
   order: 4 !important;
-  height: auto !important;
-  min-height: 220px !important;
+  height: 100% !important;
+  min-height: 0 !important;
   max-height: none !important;
   margin: 0 !important;
   border-radius: 0 0 10px 10px !important;
@@ -5958,7 +6227,7 @@ header p {
 }
 
 .results-actions {
-  order: 6 !important;
+  order: 5 !important;
   display: grid !important;
   grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
   gap: 9px !important;
@@ -6065,7 +6334,7 @@ header p {
     grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
   }
   .results-shell {
-    grid-template-rows: auto auto auto auto auto auto !important;
+    grid-template-rows: auto auto auto minmax(220px, auto) auto !important;
   }
 }
 
@@ -8816,7 +9085,7 @@ body.is-dark-mode #cancelOrderBtn:disabled {
 
 /* Panel seleccionable de estados de pedidos */
 .results-shell {
-  grid-template-rows: auto auto auto auto auto 46px !important;
+  grid-template-rows: auto auto auto minmax(0, 1fr) 46px !important;
 }
 
 .stats {
@@ -16138,10 +16407,12 @@ function _renderCarrierPanel() {
     const active = _state.activeLabelSource || 'mercadolibre';
     const isCarrier = active !== 'mercadolibre';
     const source = _getSourceConfig(active);
+    const results = document.getElementById('results');
     const table = document.querySelector('#results .table-container');
     const panel = document.getElementById('carrierLabelsPanel');
     const pdfPrinter = document.getElementById('pdfLabelPrinter');
 
+    if (results) results.classList.toggle('is-carrier-label-mode', isCarrier);
     if (table) table.classList.toggle('is-hidden', isCarrier);
     if (panel) panel.classList.toggle('is-hidden', !isCarrier);
     if (pdfPrinter) pdfPrinter.classList.toggle('is-hidden', !isCarrier);
@@ -16193,9 +16464,14 @@ function _renderCarrierPanel() {
                 </td>
                 <td>${_carrierPrintStatusHtml(active, file.id)}</td>
                 <td>
-                    <button class="carrier-open-btn" type="button"
-                        data-carrier-source="${_esc(active)}"
-                        data-carrier-file-id="${_esc(file.id)}">${_getCarrierPrintedInfo(active, file.id) ? 'Reimprimir' : 'Imprimir'}</button>
+                    <div class="carrier-row-actions">
+                        <button class="carrier-preview-btn" type="button"
+                            data-carrier-preview-source="${_esc(active)}"
+                            data-carrier-preview-file-id="${_esc(file.id)}">Visualizar</button>
+                        <button class="carrier-open-btn" type="button"
+                            data-carrier-source="${_esc(active)}"
+                            data-carrier-file-id="${_esc(file.id)}">${_getCarrierPrintedInfo(active, file.id) ? 'Reimprimir' : 'Imprimir'}</button>
+                    </div>
                 </td>
             </tr>
         `;
@@ -16270,6 +16546,48 @@ async function _printCarrierFileToZebra(sourceKey, fileId, button) {
     }
 }
 
+async function _previewCarrierFile(sourceKey, fileId, button) {
+    const source = _getSourceConfig(sourceKey);
+    const file = (_state.carrierFiles[source.key] || []).find(item => item.id === fileId);
+    if (!file?.id) {
+        _setToast('No se pudo encontrar el PDF de Drive.', false);
+        return;
+    }
+
+    const originalText = button?.textContent || 'Visualizar';
+    if (button) {
+        button.disabled = true;
+        button.textContent = 'Cargando...';
+    }
+
+    try {
+        _setToast(`Preparando vista de ${file.name || `Etiqueta ${source.label}`}...`);
+        const blob = await _downloadDriveBlob(file.id, 'application/pdf');
+        const date = _formatDriveDate(file.createdTime || file.modifiedTime) || 'Sin fecha';
+        const time = _formatDriveTime(file.createdTime || file.modifiedTime) || '';
+        const folder = file.folder || source.folder;
+
+        _showCarrierPrintModal(source, [{
+            sourceKey: source.key,
+            id: file.id,
+            name: file.name || `Etiqueta ${source.label}`,
+            meta: [folder, date, time].filter(Boolean).join(' - '),
+            url: URL.createObjectURL(blob),
+            blob,
+            printedInfo: _getCarrierPrintedInfo(source.key, file.id),
+        }]);
+        _setToast(`${file.name || `Etiqueta ${source.label}`} lista para visualizar.`);
+    } catch (err) {
+        console.warn('[DriveSync] previewCarrierFile:', err);
+        _setToast(err?.message || 'No se pudo visualizar el PDF de Drive.', false);
+    } finally {
+        if (button?.isConnected) {
+            button.disabled = false;
+            button.textContent = originalText;
+        }
+    }
+}
+
 function _cleanupCarrierPrintEntries() {
     for (const entry of _carrierPrintState.entries) {
         if (entry?.url) URL.revokeObjectURL(entry.url);
@@ -16309,7 +16627,7 @@ function _ensureCarrierPrintModal() {
             </div>
             <footer class="carrier-print-actions">
                 <button class="carrier-print-secondary" type="button" data-carrier-print-close>Cerrar</button>
-                <button class="carrier-print-primary" id="carrierPrintPrintBtn" type="button">Imprimir PDF</button>
+                <button class="carrier-print-primary" id="carrierPrintPrintBtn" type="button">Imprimir en Zebra</button>
             </footer>
         </section>
     `;
@@ -16423,13 +16741,13 @@ function _setCarrierPrintActiveIndex(index) {
     }
     if (printBtn) {
         printBtn.disabled = false;
-        printBtn.textContent = printedInfo ? 'Reimprimir PDF' : 'Imprimir PDF';
+        printBtn.textContent = printedInfo ? 'Reimprimir en Zebra' : 'Imprimir en Zebra';
         printBtn.classList.toggle('is-reprint', !!printedInfo);
     }
     if (meta) {
         meta.textContent = printedInfo
             ? `Esta etiqueta ya fue marcada como impresa: ${_carrierPrintStatusText(printedInfo)}.`
-            : `${entries.length} PDF(s) listo(s). Revisa el cuadre y presiona Imprimir PDF.`;
+            : `${entries.length} PDF(s) listo(s). Visualiza la etiqueta y presiona Imprimir en Zebra.`;
     }
 
     modal.querySelectorAll('[data-carrier-print-index]').forEach(button => {
@@ -16448,7 +16766,7 @@ function _showCarrierPrintModal(source, entries) {
 
     modal.querySelector('#carrierPrintKicker').textContent = source.label;
     modal.querySelector('#carrierPrintTitle').textContent = `Etiquetas ${source.label}`;
-    modal.querySelector('#carrierPrintMeta').textContent = `${entries.length} PDF(s) listo(s). Revisa el cuadre y presiona Imprimir PDF.`;
+    modal.querySelector('#carrierPrintMeta').textContent = `${entries.length} PDF(s) listo(s). Visualiza la etiqueta y presiona Imprimir en Zebra.`;
 
     const select = modal.querySelector('#carrierPrintSelect');
     const list = modal.querySelector('#carrierPrintFileList');
@@ -16483,13 +16801,12 @@ function _showCarrierPrintModal(source, entries) {
     modal.querySelector('#carrierPrintPrintBtn')?.focus();
 }
 
-function _printCurrentCarrierPdf() {
+async function _printCurrentCarrierPdf() {
     const modal = _ensureCarrierPrintModal();
-    const frame = modal.querySelector('#carrierPrintFrame');
     const button = modal.querySelector('#carrierPrintPrintBtn');
     const entry = _carrierPrintState.entries[_carrierPrintState.activeIndex];
 
-    if (!frame?.src) {
+    if (!entry?.id) {
         _setToast('Selecciona un PDF para imprimir.', false);
         return;
     }
@@ -16501,46 +16818,45 @@ function _printCurrentCarrierPdf() {
         if (!ok) return;
     }
 
-    const originalText = button?.textContent || 'Imprimir PDF';
-    if (button) {
-        button.disabled = true;
-        button.textContent = 'Preparando impresion...';
+    const app = window.App;
+    if (!app?.pdfLabels?.printPdfBlob) {
+        _setToast('El impresor PDF Zebra no esta disponible. Recarga la pagina.', false);
+        return;
     }
 
-    const runPrint = () => {
-        try {
-            frame.contentWindow?.focus();
-            frame.contentWindow?.print();
-            if (entry) {
-                entry.printedInfo = _markCarrierPrinted(entry);
-                _renderCarrierPanel();
-                _syncCarrierPrintStatusUi();
-                const meta = modal.querySelector('#carrierPrintMeta');
-                if (meta) {
-                    meta.textContent = `Esta etiqueta ya fue marcada como impresa: ${_carrierPrintStatusText(entry.printedInfo)}.`;
-                }
-                if (button) {
-                    button.textContent = 'Reimprimir PDF';
-                    button.classList.add('is-reprint');
-                }
-            }
-            _setToast(printedInfo ? 'Etiqueta marcada como reimpresa.' : 'Etiqueta marcada como impresa.');
-        } catch (err) {
-            console.warn('[DriveSync] print current PDF:', err);
-            _setToast('No se pudo abrir el dialogo de impresion del PDF.', false);
-        } finally {
-            if (button) {
-                const currentPrinted = entry ? _getCarrierPrintedInfo(entry.sourceKey, entry.id) : null;
-                button.textContent = currentPrinted ? 'Reimprimir PDF' : originalText;
-                button.disabled = false;
-            }
-        }
-    };
+    const originalText = button?.textContent || 'Imprimir en Zebra';
+    if (button) {
+        button.disabled = true;
+        button.textContent = 'Imprimiendo...';
+    }
 
-    if (frame.dataset.loaded === '1') {
-        window.setTimeout(runPrint, 150);
-    } else {
-        frame.addEventListener('load', () => window.setTimeout(runPrint, 250), { once: true });
+    try {
+        const blob = entry.blob || await _downloadDriveBlob(entry.id, 'application/pdf');
+        entry.blob = blob;
+        const result = await app.pdfLabels.printPdfBlob(blob, entry.name, {
+            onProgress: message => _setToast(message)
+        });
+        entry.printedInfo = _markCarrierPrinted(entry);
+        _renderCarrierPanel();
+        _syncCarrierPrintStatusUi();
+        const meta = modal.querySelector('#carrierPrintMeta');
+        if (meta) {
+            meta.textContent = `Esta etiqueta ya fue marcada como impresa: ${_carrierPrintStatusText(entry.printedInfo)}.`;
+        }
+        if (button) {
+            button.textContent = 'Reimprimir en Zebra';
+            button.classList.add('is-reprint');
+        }
+        _setToast(`${entry.name} enviada a ${result.printer}.`);
+    } catch (err) {
+        console.warn('[DriveSync] print current carrier PDF:', err);
+        _setToast(err?.message || 'No se pudo imprimir el PDF de Drive en Zebra.', false);
+    } finally {
+        if (button) {
+            const currentPrinted = _getCarrierPrintedInfo(entry.sourceKey, entry.id);
+            button.textContent = currentPrinted ? 'Reimprimir en Zebra' : originalText;
+            button.disabled = false;
+        }
     }
 }
 
@@ -16635,6 +16951,17 @@ function _initCarrierLabelsUi() {
     if (!results) return;
 
     results.addEventListener('click', event => {
+        const previewBtn = event.target.closest('[data-carrier-preview-file-id]');
+        if (previewBtn) {
+            event.preventDefault();
+            _previewCarrierFile(
+                previewBtn.dataset.carrierPreviewSource,
+                previewBtn.dataset.carrierPreviewFileId,
+                previewBtn
+            );
+            return;
+        }
+
         const openBtn = event.target.closest('[data-carrier-file-id]');
         if (openBtn) {
             event.preventDefault();
