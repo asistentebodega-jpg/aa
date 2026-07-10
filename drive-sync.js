@@ -976,7 +976,7 @@ function _renderCarrierPanel() {
                 <td>
                     <button class="carrier-open-btn" type="button"
                         data-carrier-source="${_esc(active)}"
-                        data-carrier-file-id="${_esc(file.id)}">Abrir PDF</button>
+                        data-carrier-file-id="${_esc(file.id)}">${_getCarrierPrintedInfo(active, file.id) ? 'Reimprimir' : 'Imprimir'}</button>
                 </td>
             </tr>
         `;
@@ -998,31 +998,56 @@ function _setActiveLabelSource(sourceKey) {
     }
 }
 
-async function _openCarrierFile(sourceKey, fileId) {
+async function _printCarrierFileToZebra(sourceKey, fileId, button) {
     const source = _getSourceConfig(sourceKey);
     const file = (_state.carrierFiles[sourceKey] || []).find(item => item.id === fileId);
     if (!file?.id) {
-        _setToast('No se pudo abrir el PDF de Drive.', false);
+        _setToast('No se pudo encontrar el PDF de Drive.', false);
         return;
     }
 
+    const printedInfo = _getCarrierPrintedInfo(source.key, file.id);
+    if (printedInfo) {
+        const when = _formatCarrierPrintedAt(printedInfo);
+        const ok = window.confirm(`Esta etiqueta ya figura como impresa${when ? ` (${when})` : ''}. Quieres imprimirla otra vez?`);
+        if (!ok) return;
+    }
+
+    const app = window.App;
+    if (!app?.pdfLabels?.printPdfBlob) {
+        _setToast('El impresor PDF Zebra no esta disponible. Recarga la pagina.', false);
+        return;
+    }
+
+    const originalText = button?.textContent || 'Imprimir';
+    if (button) {
+        button.disabled = true;
+        button.textContent = 'Imprimiendo...';
+    }
+
     try {
+        _setToast(`Preparando ${file.name || `Etiqueta ${source.label}`} para Zebra...`);
         const blob = await _downloadDriveBlob(file.id, 'application/pdf');
-        const date = _formatDriveDate(file.createdTime || file.modifiedTime) || 'Sin fecha';
-        const time = _formatDriveTime(file.createdTime || file.modifiedTime) || '';
-        const folder = file.folder || source.folder;
-        _showCarrierPrintModal(source, [{
+        const entry = {
             sourceKey: source.key,
             id: file.id,
             name: file.name || `Etiqueta ${source.label}`,
-            meta: [folder, date, time].filter(Boolean).join(' - '),
-            url: URL.createObjectURL(blob),
-            printedInfo: _getCarrierPrintedInfo(source.key, file.id),
-        }]);
-        _setToast('PDF listo para revisar e imprimir.');
+        };
+        const result = await app.pdfLabels.printPdfBlob(blob, entry.name, {
+            onProgress: message => _setToast(message)
+        });
+
+        _markCarrierPrinted(entry);
+        _renderCarrierPanel();
+        _setToast(`${entry.name} enviada a ${result.printer}.`);
     } catch (err) {
-        console.warn('[DriveSync] openCarrierFile:', err);
-        _setToast('No se pudo preparar el PDF de Drive.', false);
+        console.warn('[DriveSync] printCarrierFileToZebra:', err);
+        _setToast(err?.message || 'No se pudo imprimir el PDF de Drive en Zebra.', false);
+    } finally {
+        if (button?.isConnected) {
+            button.disabled = false;
+            button.textContent = _getCarrierPrintedInfo(source.key, file.id) ? 'Reimprimir' : originalText;
+        }
     }
 }
 
@@ -1394,7 +1419,7 @@ function _initCarrierLabelsUi() {
         const openBtn = event.target.closest('[data-carrier-file-id]');
         if (openBtn) {
             event.preventDefault();
-            _openCarrierFile(openBtn.dataset.carrierSource, openBtn.dataset.carrierFileId);
+            _printCarrierFileToZebra(openBtn.dataset.carrierSource, openBtn.dataset.carrierFileId, openBtn);
             return;
         }
 

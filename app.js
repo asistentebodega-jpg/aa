@@ -3482,6 +3482,47 @@
                         App.state.pdfLabelsPrinting = false;
                         App.pdfLabels.updateStatus();
                     }
+                },
+
+                async printPdfBlob(blob, filename = 'Etiqueta PDF', options = {}) {
+                    if (!blob) {
+                        throw new Error('No se recibio el PDF para imprimir.');
+                    }
+
+                    const pdfjs = await App.pdfLabels.ensurePdfJsLoaded();
+                    const buffer = await blob.arrayBuffer();
+                    const pdf = await pdfjs.getDocument({ data: buffer }).promise;
+                    const printerConfig = App.actions.getSelectedZebraPrinterConfig();
+                    const printer = await App.actions.resolveZebraPrinter(printerConfig);
+
+                    if (!printer || typeof printer !== 'object' || !printer.uid) {
+                        throw new Error(
+                            'No se encontro ninguna impresora Zebra disponible. Asegurate de que Browser Print este abierto y la impresora este agregada.'
+                        );
+                    }
+
+                    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum += 1) {
+                        options.onProgress?.(`Imprimiendo ${filename} pagina ${pageNum} de ${pdf.numPages}...`);
+                        const page = await pdf.getPage(pageNum);
+                        const viewport = page.getViewport({ scale: App.config.PDF_RENDER_SCALE });
+                        const canvas = document.createElement('canvas');
+                        canvas.width = Math.ceil(viewport.width);
+                        canvas.height = Math.ceil(viewport.height);
+                        const context = canvas.getContext('2d', { willReadFrequently: true });
+
+                        await page.render({ canvasContext: context, viewport }).promise;
+
+                        const cropped = App.pdfLabels.cropCanvas(canvas);
+                        const fittedCanvas = App.pdfLabels.fitCanvasToRollWidth(cropped);
+                        const zpl = App.pdfLabels.canvasToZpl(fittedCanvas);
+                        await App.pdfLabels.sendZplToPrinter(printer, zpl);
+                    }
+
+                    return {
+                        ok: true,
+                        printed: pdf.numPages,
+                        printer: printerConfig.label
+                    };
                 }
             },
 

@@ -6943,35 +6943,6 @@ body.is-dark-mode .btn-carrier-walmart {
                     <div class="results-lookup-slot" id="resultsLookupSlot" hidden></div>
                     <div class="results-meta" id="resultsMeta"></div>
 
-                    <section class="pdf-label-printer is-hidden" id="pdfLabelPrinter" aria-labelledby="pdfLabelPrinterTitle">
-                        <div class="pdf-label-head">
-                            <div>
-                                <strong id="pdfLabelPrinterTitle">Impresor PDF Zebra</strong>
-                                <span>Carga PDFs, revisa el orden y envia cada pagina como etiqueta.</span>
-                            </div>
-                            <div class="pdf-label-controls">
-                                <input type="file" id="pdfLabelFileInput" accept="application/pdf,.pdf" multiple>
-                                <button class="pdf-label-control" id="pdfLabelPickBtn" type="button">Cargar PDF</button>
-                                <button class="pdf-label-control" id="pdfLabelClearBtn" type="button" disabled>Vaciar</button>
-                                <label class="pdf-label-width-control" for="pdfLabelWidthInput">
-                                    <span>Rollo</span>
-                                    <input type="number" id="pdfLabelWidthInput" value="100" min="40" max="210" step="1">
-                                    <span>mm</span>
-                                </label>
-                            </div>
-                        </div>
-                        <div class="pdf-label-status-row">
-                            <span id="pdfLabelStatus">Sin PDFs cargados</span>
-                            <span class="pdf-label-progress" id="pdfLabelProgress"></span>
-                        </div>
-                        <div class="pdf-label-grid" id="pdfLabelGrid"></div>
-                        <p class="pdf-label-empty" id="pdfLabelEmpty">Carga uno o mas PDF de etiquetas para previsualizarlos aqui.</p>
-                        <div class="pdf-label-footer">
-                            <button class="pdf-label-secondary" id="pdfLabelDialogBtn" type="button" disabled>Imprimir con dialogo</button>
-                            <button class="pdf-label-primary" id="pdfLabelPrintBtn" type="button" disabled>Imprimir PDFs a Zebra</button>
-                        </div>
-                    </section>
-
                     <div class="table-container">
                         <table id="dataTable">
                             <thead>
@@ -7157,8 +7128,6 @@ body.is-dark-mode .btn-carrier-walmart {
                 </div>
             </section>
         </div>
-
-    <div class="pdf-print-only" id="pdfLabelPrintArea"></div>
 
     <script>
     (function(){
@@ -9115,7 +9084,7 @@ body.is-dark-mode .status-summary-option.is-default .status-summary-icon {
   }
 }
 </style>
-    <script src="app.js?v=20260710-pdf-printer-carrier" defer data-app-script></script>
-    <script src="drive-sync.js?v=20260710-pdf-printer-carrier" defer></script>
+    <script src="app.js?v=20260710-drive-pdf-direct-print" defer data-app-script></script>
+    <script src="drive-sync.js?v=20260710-drive-pdf-direct-print" defer></script>
 </body>
 </html>
