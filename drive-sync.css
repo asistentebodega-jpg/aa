@@ -1,0 +1,288 @@
+/* ============================================================
+   drive-sync.css
+   Estilos para los componentes dinámicos de drive-sync.js.
+   Todas las clases usan prefijo .ds- para evitar colisiones.
+   Cargar DESPUÉS de styles.css y left-panel.css en index.html:
+     <link rel="stylesheet" href="drive-sync.css">
+   ============================================================ */
+
+/* ── Utilidad ── */
+.ds-hidden { display: none !important; }
+
+/* ── Status activo ── */
+#drive-sync-status.drive-sync-status--active {
+  color: #00ac47;
+  font-weight: 600;
+}
+
+/* ── Toast ── */
+#drive-sync-toast {
+  border-left-color: #00ac47;
+}
+#drive-sync-toast.drive-sync-toast--error {
+  border-left-color: #ea4335;
+  background: rgba(234,67,53,0.05);
+}
+
+/* ── Modo Auto / Manual ── */
+#drive-mode-auto,
+#drive-mode-manual {
+  background: transparent;
+  color: var(--text-muted, #888);
+}
+#drive-mode-auto.is-active {
+  background: #00ac47;
+  color: #fff;
+}
+#drive-mode-manual.is-active {
+  background: #1a73e8;
+  color: #fff;
+}
+
+/* ── API Key inline ── */
+.ds-apikey-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.ds-apikey-input {
+  flex: 1;
+  padding: 6px 9px;
+  border: 1px solid var(--border, #e0e0e0);
+  border-radius: 6px;
+  font-size: 12px;
+  background: var(--surface, #fff);
+  color: var(--text, #222);
+  outline: none;
+  transition: border-color 0.15s;
+}
+.ds-apikey-input:focus { border-color: #1a73e8; }
+.ds-apikey-input.ds-apikey-input--error { border-color: #ea4335; }
+
+/* ── Botones comunes ── */
+.ds-btn {
+  padding: 5px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+.ds-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.ds-btn--process  { background: #00ac47; color: #fff; }
+.ds-btn--process:hover:not(:disabled) { background: #009940; }
+.ds-btn--dismiss  { background: transparent; color: var(--text-muted, #888); border: 1px solid var(--border, #e0e0e0); }
+.ds-btn--dismiss:hover { background: var(--surface-soft, #f5f5f5); }
+.ds-btn--save     { background: #1a73e8; color: #fff; }
+.ds-btn--save:hover { background: #1557b0; }
+
+/* ── Tags ── */
+.ds-tag {
+  display: inline-block;
+  border-radius: 4px;
+  padding: 2px 7px;
+  font-size: 11px;
+  font-weight: 500;
+}
+.ds-tag--folder { background: #e8f5e9; color: #2e7d32; }
+.ds-tag--bulk   { background: #e3f2fd; color: #1565c0; }
+
+/* ── Pendientes ── */
+.ds-pending-row {
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #e0e0e0);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+}
+.ds-pending-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.ds-pending-name {
+  font-weight: 600;
+  color: var(--text, #222);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 155px;
+}
+.ds-pending-time {
+  color: var(--text-muted, #888);
+  font-size: 11px;
+  flex-shrink: 0;
+}
+.ds-pending-tags {
+  display: flex;
+  gap: 4px;
+}
+.ds-pending-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.ds-pending-select {
+  flex: 1;
+  padding: 5px 8px;
+  border: 1px solid var(--border, #e0e0e0);
+  border-radius: 6px;
+  font-size: 12px;
+  background: var(--surface, #fff);
+  color: var(--text, #222);
+}
+
+/* ── Procesados ── */
+.ds-proc-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 10px;
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #e0e0e0);
+  border-radius: 6px;
+  font-size: 11px;
+}
+.ds-proc-name {
+  color: var(--text, #222);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 130px;
+}
+.ds-proc-meta {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  flex-shrink: 0;
+}
+.ds-proc-picker { color: var(--text-muted, #888); }
+.ds-proc-time   { color: var(--text-muted, #888); }
+
+/* ── Panel de archivos existentes ── */
+.ds-ep-panel {
+  display: none;
+  margin-top: 10px;
+  border: 1px solid rgba(15, 23, 42, 0.10);
+  border-radius: 10px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.96);
+}
+
+.ds-ep-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: rgba(0, 172, 71, 0.06);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+.ds-ep-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ds-ep-btn-nav {
+  background: transparent;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 1px 6px;
+  color: #0F6E56;
+  line-height: 1.4;
+  transition: background 0.15s;
+}
+.ds-ep-btn-nav:hover { background: rgba(15, 110, 86, 0.08); }
+.ds-ep-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #0F6E56;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.ds-ep-close {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #5C6F63;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0 2px;
+  transition: color 0.15s;
+}
+.ds-ep-close:hover { color: #17301F; }
+
+.ds-ep-body {
+  max-height: 260px;
+  overflow-y: auto;
+}
+.ds-ep-file-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 9px 12px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+}
+.ds-ep-file-row--done { background: rgba(0, 172, 71, 0.04); }
+.ds-ep-file-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+}
+.ds-ep-file-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #17301F;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 160px;
+}
+.ds-ep-file-folder {
+  font-size: 10px;
+  color: #5C6F63;
+  flex-shrink: 0;
+}
+.ds-ep-file-actions {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+.ds-ep-select {
+  flex: 1;
+  padding: 4px 7px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 6px;
+  font-size: 11px;
+  background: #fff;
+  color: #17301F;
+}
+.ds-ep-btn-process {
+  padding: 4px 11px !important;
+  font-size: 11px !important;
+}
+.ds-ep-done-badge {
+  flex: 1;
+  padding: 4px 10px;
+  background: #e8f5e9;
+  color: #2e7d32;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+}
+.ds-ep-empty,
+.ds-ep-loading {
+  padding: 14px;
+  text-align: center;
+  color: #5C6F63;
+  font-size: 12px;
+}
