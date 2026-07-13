@@ -4095,6 +4095,135 @@ body.is-dark-mode .results-toolbar .results-advanced-btn:disabled {
   opacity: 1 !important;
 }
 
+/* Modo oscuro negro puro */
+body.is-dark-mode {
+  --dark-bg: #000000;
+  --dark-header: #000000;
+  --dark-sidebar: #000000;
+  --dark-panel: #000000;
+  --dark-card: #000000;
+  --dark-card-soft: #050505;
+  --dark-table: #000000;
+  --surface: #000000;
+  --surface-base: #000000;
+  --surface-soft: #050505;
+  background: #000000 !important;
+  background-image: none !important;
+}
+
+body.is-dark-mode .container,
+body.is-dark-mode header,
+body.is-dark-mode .panel-left,
+body.is-dark-mode .panel-left.panel,
+body.is-dark-mode .panel-main,
+body.is-dark-mode .results-shell {
+  background: #000000 !important;
+  background-image: none !important;
+}
+
+body.is-dark-mode .panel,
+body.is-dark-mode .left-panel-top,
+body.is-dark-mode .storage-card,
+body.is-dark-mode .input-group,
+body.is-dark-mode .method-card,
+body.is-dark-mode .stat-item,
+body.is-dark-mode .status-summary-card,
+body.is-dark-mode .status-summary-option,
+body.is-dark-mode .results-toolbar,
+body.is-dark-mode .results-lookup-slot,
+body.is-dark-mode .results-meta,
+body.is-dark-mode .table-container,
+body.is-dark-mode #dataTable,
+body.is-dark-mode #dataTable thead,
+body.is-dark-mode #dataTable tbody,
+body.is-dark-mode #dataTable tr,
+body.is-dark-mode #dataTable th,
+body.is-dark-mode #dataTable td,
+body.is-dark-mode .carrier-labels-panel,
+body.is-dark-mode .carrier-labels-head,
+body.is-dark-mode .carrier-labels-table,
+body.is-dark-mode .carrier-labels-table thead,
+body.is-dark-mode .carrier-labels-table th,
+body.is-dark-mode .carrier-labels-table td,
+body.is-dark-mode .order-lookup-table,
+body.is-dark-mode .order-lookup-table thead,
+body.is-dark-mode .order-lookup-table tbody,
+body.is-dark-mode .order-lookup-table tr,
+body.is-dark-mode .order-lookup-table th,
+body.is-dark-mode .order-lookup-table td,
+body.is-dark-mode .pdf-label-printer,
+body.is-dark-mode .pdf-label-card,
+body.is-dark-mode .pdf-label-empty,
+body.is-dark-mode .zebra-printer-control,
+body.is-dark-mode .carrier-zebra-printer-control,
+body.is-dark-mode .order-lookup-card,
+body.is-dark-mode .order-lookup-controls,
+body.is-dark-mode .order-lookup-summary,
+body.is-dark-mode .order-lookup-table-wrap,
+body.is-dark-mode #drive-sync-panel,
+body.is-dark-mode #drive-pending-section,
+body.is-dark-mode .lp-card,
+body.is-dark-mode .lp-picker-card,
+body.is-dark-mode .lp-tabs-card,
+body.is-dark-mode .lp-history-card,
+body.is-dark-mode .history-item,
+body.is-dark-mode .ds-proc-row,
+body.is-dark-mode .ds-ep-panel,
+body.is-dark-mode .ds-ep-file-row,
+body.is-dark-mode .app-notification-panel,
+body.is-dark-mode .notification-head,
+body.is-dark-mode .notification-summary,
+body.is-dark-mode .notification-actions,
+body.is-dark-mode .notification-item,
+body.is-dark-mode .notification-summary-item {
+  background: #000000 !important;
+  background-image: none !important;
+}
+
+body.is-dark-mode input,
+body.is-dark-mode textarea,
+body.is-dark-mode select,
+body.is-dark-mode .search-input,
+body.is-dark-mode .table-status-filter,
+body.is-dark-mode .panel-left #picker,
+body.is-dark-mode .panel-left #textInput,
+body.is-dark-mode .order-lookup-search-input,
+body.is-dark-mode .order-lookup-filter-field select,
+body.is-dark-mode .lp-drive-sound-select,
+body.is-dark-mode .zebra-printer-control select,
+body.is-dark-mode .carrier-zebra-printer-control select {
+  background: #000000 !important;
+  background-image: none !important;
+}
+
+body.is-dark-mode .carrier-preview-btn,
+body.is-dark-mode .carrier-open-btn {
+  background: #050505 !important;
+  background-image: none !important;
+  border-color: rgba(59, 130, 246, 0.42) !important;
+  color: #93C5FD !important;
+  box-shadow: none !important;
+}
+
+body.is-dark-mode .carrier-open-btn {
+  border-color: rgba(52, 211, 153, 0.38) !important;
+  color: #A7F3D0 !important;
+}
+
+body.is-dark-mode .carrier-preview-btn:hover:not(:disabled),
+body.is-dark-mode .carrier-open-btn:hover:not(:disabled) {
+  background: #0A0A0A !important;
+  border-color: rgba(52, 211, 153, 0.58) !important;
+}
+
+body.is-dark-mode .carrier-preview-btn:disabled,
+body.is-dark-mode .carrier-open-btn:disabled {
+  background: #000000 !important;
+  border-color: rgba(148, 163, 184, 0.18) !important;
+  color: #64748B !important;
+  opacity: 1 !important;
+}
+
 @media (min-width: 1450px) {
   .results-toolbar .results-search-group {
     grid-template-columns: minmax(170px, 1fr) 140px calc(6cm - 16px) 270px 128px !important;
