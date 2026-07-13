@@ -3838,6 +3838,34 @@ body.is-dark-mode .drive-user-action-row .drive-picker-control select {
 
 #drive-token-clock,
 .ds-token-clock {
+  color: #00883A !important;
+  background: rgba(0, 172, 71, 0.08) !important;
+  border: 1px solid rgba(0, 172, 71, 0.18) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78) !important;
+  text-shadow: none !important;
+  font-weight: 900 !important;
+}
+
+#drive-token-clock.ds-token-clock--warning,
+.ds-token-clock.ds-token-clock--warning {
+  color: #B45309 !important;
+  background: rgba(245, 158, 11, 0.12) !important;
+  border-color: rgba(245, 158, 11, 0.30) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.70) !important;
+  text-shadow: none !important;
+}
+
+#drive-token-clock.ds-token-clock--critical,
+.ds-token-clock.ds-token-clock--critical {
+  color: #BE123C !important;
+  background: rgba(244, 63, 94, 0.12) !important;
+  border-color: rgba(244, 63, 94, 0.30) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.70) !important;
+  text-shadow: none !important;
+}
+
+body.is-dark-mode #drive-token-clock,
+body.is-dark-mode .ds-token-clock {
   color: #34F39A !important;
   background: rgba(52, 243, 154, 0.18) !important;
   border: 1px solid rgba(52, 243, 154, 0.58) !important;
@@ -3849,8 +3877,8 @@ body.is-dark-mode .drive-user-action-row .drive-picker-control select {
   font-weight: 950 !important;
 }
 
-#drive-token-clock.ds-token-clock--warning,
-.ds-token-clock.ds-token-clock--warning {
+body.is-dark-mode #drive-token-clock.ds-token-clock--warning,
+body.is-dark-mode .ds-token-clock.ds-token-clock--warning {
   color: #FCD34D !important;
   background: rgba(251, 191, 36, 0.20) !important;
   border-color: rgba(251, 191, 36, 0.60) !important;
@@ -3861,8 +3889,8 @@ body.is-dark-mode .drive-user-action-row .drive-picker-control select {
   text-shadow: 0 0 10px rgba(252, 211, 77, 0.72) !important;
 }
 
-#drive-token-clock.ds-token-clock--critical,
-.ds-token-clock.ds-token-clock--critical {
+body.is-dark-mode #drive-token-clock.ds-token-clock--critical,
+body.is-dark-mode .ds-token-clock.ds-token-clock--critical {
   color: #FDA4AF !important;
   background: rgba(244, 63, 94, 0.22) !important;
   border-color: rgba(251, 113, 133, 0.64) !important;
