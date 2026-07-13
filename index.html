@@ -1692,6 +1692,39 @@
             flex-wrap: wrap;
         }
 
+        .carrier-zebra-printer-control {
+            height: 30px;
+            min-width: 190px;
+            display: grid;
+            grid-template-columns: 44px minmax(0, 1fr);
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0 0.42rem 0 0.56rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #fff;
+            color: var(--text-muted);
+            font-size: 0.64rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .carrier-zebra-printer-control select {
+            width: 100%;
+            min-width: 0;
+            height: 22px;
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            border-radius: 6px;
+            outline: none;
+            background: #F8FAF9;
+            color: var(--text);
+            font-size: 0.68rem;
+            font-weight: 800;
+            padding: 0 0.35rem;
+            text-overflow: ellipsis;
+        }
+
         .carrier-refresh-btn,
         .carrier-print-all-btn,
         .carrier-preview-btn,
@@ -2382,6 +2415,18 @@
             background: #34D399;
             border-color: #34D399;
             color: #06140D;
+        }
+
+        body.is-dark-mode .carrier-zebra-printer-control {
+            background: #111827;
+            border-color: rgba(148, 163, 184, 0.30);
+            color: #C7D6EA;
+        }
+
+        body.is-dark-mode .carrier-zebra-printer-control select {
+            background: #0B1220;
+            border-color: rgba(148, 163, 184, 0.24);
+            color: #F4F8FF;
         }
 
         body.is-dark-mode .pdf-label-head strong,
@@ -7419,6 +7464,14 @@ body.is-dark-mode .btn-carrier-walmart {
                                 <span id="carrierLabelsSummary">Conecta Drive para revisar archivos PDF.</span>
                             </div>
                             <div class="carrier-label-actions">
+                                <label class="carrier-zebra-printer-control" for="carrierZebraPrinterSelect">
+                                    <span>Zebra</span>
+                                    <select id="carrierZebraPrinterSelect" name="carrierZebraPrinter" title="Seleccionar impresora Zebra para Bluexpress y Walmart">
+                                        <option value="default">Predeterminada</option>
+                                        <option value="zebra02">ZEBRA 02</option>
+                                        <option value="zebra05">ZEBRA 05</option>
+                                    </select>
+                                </label>
                                 <button class="carrier-print-all-btn" id="carrierPrintAllBtn" type="button" title="Imprimir todas las etiquetas PDF" disabled>Imprimir todo</button>
                                 <button class="carrier-refresh-btn" id="carrierLabelsRefreshBtn" type="button" title="Actualizar etiquetas PDF">Actualizar</button>
                             </div>

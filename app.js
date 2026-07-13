@@ -87,6 +87,7 @@
             pdfLabelGrid: document.getElementById('pdfLabelGrid'),
             pdfLabelEmpty: document.getElementById('pdfLabelEmpty'),
             pdfLabelPrintArea: document.getElementById('pdfLabelPrintArea'),
+            carrierZebraPrinterSelect: document.getElementById('carrierZebraPrinterSelect'),
             pasteTitle: document.querySelector('.input-methods .method-card:last-child h3')
         });
 
@@ -5708,22 +5709,33 @@
                     }
                 },
 
-                getSelectedZebraPrinterConfig() {
+                syncZebraPrinterControls(key = App.state.selectedZebraPrinter) {
+                    const normalizedKey = App.helpers.normalizeZebraPrinterKey(key);
+                    if (App.dom.zebraPrinterSelect) {
+                        App.dom.zebraPrinterSelect.value = normalizedKey;
+                    }
+                    if (App.dom.carrierZebraPrinterSelect) {
+                        App.dom.carrierZebraPrinterSelect.value = normalizedKey;
+                    }
+                },
+
+                getSelectedZebraPrinterConfig(keyOverride = '') {
                     const key = App.helpers.normalizeZebraPrinterKey(
-                        App.dom.zebraPrinterSelect?.value || App.state.selectedZebraPrinter
+                        keyOverride || App.state.selectedZebraPrinter || App.dom.zebraPrinterSelect?.value
                     );
 
                     return App.config.ZEBRA_PRINTERS[key] || App.config.ZEBRA_PRINTERS.default;
                 },
 
-                handleZebraPrinterChange() {
-                    const config = App.actions.getSelectedZebraPrinterConfig();
+                handleZebraPrinterChange(event) {
+                    const requestedKey = event?.currentTarget?.value
+                        || App.dom.zebraPrinterSelect?.value
+                        || App.dom.carrierZebraPrinterSelect?.value
+                        || App.state.selectedZebraPrinter;
+                    const config = App.actions.getSelectedZebraPrinterConfig(requestedKey);
                     App.state.selectedZebraPrinter = config.key;
                     App.actions.persistZebraPrinterPreference(config.key);
-
-                    if (App.dom.zebraPrinterSelect) {
-                        App.dom.zebraPrinterSelect.value = config.key;
-                    }
+                    App.actions.syncZebraPrinterControls(config.key);
                 },
 
                 getZebraDeviceSearchText(device) {
@@ -6099,6 +6111,7 @@
                     App.dom.pdfLabelPrintBtn?.addEventListener('click', App.pdfLabels.printAllToZebra);
                     App.dom.pdfLabelWidthInput?.addEventListener('input', App.pdfLabels.render);
                     App.dom.zebraPrinterSelect?.addEventListener('change', App.actions.handleZebraPrinterChange);
+                    App.dom.carrierZebraPrinterSelect?.addEventListener('change', App.actions.handleZebraPrinterChange);
                     App.dom.themeToggleBtn?.addEventListener('click', event => {
                         event.stopPropagation();
                         App.theme.toggle();
@@ -6169,9 +6182,7 @@
                     App.state.embeddedDocuments
                 );
 
-                if (App.dom.zebraPrinterSelect) {
-                    App.dom.zebraPrinterSelect.value = App.state.selectedZebraPrinter;
-                }
+                App.actions.syncZebraPrinterControls(App.state.selectedZebraPrinter);
 
                 if (App.dom.pasteTitle) {
                     App.dom.pasteTitle.textContent = 'Pegar Texto';
