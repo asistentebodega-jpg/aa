@@ -3932,3 +3932,151 @@ body.is-dark-mode .status-summary-option.is-default .status-summary-icon {
     grid-template-columns: 1fr !important;
   }
 }
+
+/* Minimal toolbar actions */
+.results-toolbar .results-history-btn,
+.results-toolbar .results-cancel-btn,
+.results-toolbar .results-manual-btn,
+.results-toolbar .results-advanced-btn {
+  height: 32px !important;
+  min-height: 32px !important;
+  border-radius: 7px !important;
+  padding: 0 11px !important;
+  border: 1px solid rgba(15, 23, 42, 0.12) !important;
+  background: #FFFFFF !important;
+  box-shadow: none !important;
+  color: #334155 !important;
+  font-size: 10.5px !important;
+  font-weight: 760 !important;
+  line-height: 1 !important;
+  letter-spacing: 0 !important;
+  transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease, transform 0.16s ease !important;
+}
+
+.results-toolbar #showStoredBtn {
+  border-color: rgba(0, 168, 71, 0.22) !important;
+  background: #FFFFFF !important;
+  color: #008A3B !important;
+}
+
+.results-toolbar #cancelOrderBtn {
+  border-color: rgba(190, 18, 60, 0.18) !important;
+  background: #FFFFFF !important;
+  color: #BE123C !important;
+}
+
+.results-toolbar #processManualBtn {
+  border-color: rgba(0, 138, 59, 0.20) !important;
+  background: #FFFFFF !important;
+  color: #008A3B !important;
+}
+
+.results-toolbar .results-advanced-btn svg {
+  width: 13px !important;
+  height: 13px !important;
+}
+
+.results-toolbar .results-history-btn:hover:not(:disabled),
+.results-toolbar .results-cancel-btn:hover:not(:disabled),
+.results-toolbar .results-manual-btn:hover:not(:disabled),
+.results-toolbar .results-advanced-btn:hover:not(:disabled) {
+  background: #F8FAFC !important;
+  border-color: rgba(15, 23, 42, 0.22) !important;
+  transform: translateY(-1px) !important;
+}
+
+.results-toolbar #showStoredBtn:hover:not(:disabled),
+.results-toolbar #processManualBtn:hover:not(:disabled) {
+  background: #F1FBF5 !important;
+  border-color: rgba(0, 168, 71, 0.32) !important;
+}
+
+.results-toolbar #cancelOrderBtn:hover:not(:disabled) {
+  background: #FFF7F8 !important;
+  border-color: rgba(190, 18, 60, 0.28) !important;
+}
+
+.results-toolbar .results-history-btn:disabled,
+.results-toolbar .results-cancel-btn:disabled,
+.results-toolbar .results-manual-btn:disabled,
+.results-toolbar .results-advanced-btn:disabled {
+  border-color: rgba(15, 23, 42, 0.08) !important;
+  background: rgba(255, 255, 255, 0.72) !important;
+  color: #94A3B8 !important;
+  opacity: 1 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
+
+body.is-dark-mode .results-toolbar .results-history-btn,
+body.is-dark-mode .results-toolbar .results-cancel-btn,
+body.is-dark-mode .results-toolbar .results-manual-btn,
+body.is-dark-mode .results-toolbar .results-advanced-btn {
+  border-color: rgba(148, 163, 184, 0.24) !important;
+  background: rgba(15, 23, 42, 0.72) !important;
+  box-shadow: none !important;
+  color: #DCEBFF !important;
+}
+
+body.is-dark-mode .results-toolbar #showStoredBtn,
+body.is-dark-mode .results-toolbar #processManualBtn {
+  border-color: rgba(52, 211, 153, 0.34) !important;
+  background: rgba(15, 23, 42, 0.72) !important;
+  color: #A7F3D0 !important;
+}
+
+body.is-dark-mode .results-toolbar #cancelOrderBtn {
+  border-color: rgba(251, 113, 133, 0.34) !important;
+  background: rgba(15, 23, 42, 0.72) !important;
+  color: #FDA4AF !important;
+}
+
+body.is-dark-mode .results-toolbar .results-history-btn:hover:not(:disabled),
+body.is-dark-mode .results-toolbar .results-cancel-btn:hover:not(:disabled),
+body.is-dark-mode .results-toolbar .results-manual-btn:hover:not(:disabled),
+body.is-dark-mode .results-toolbar .results-advanced-btn:hover:not(:disabled) {
+  background: rgba(30, 41, 59, 0.88) !important;
+  border-color: rgba(148, 163, 184, 0.40) !important;
+  filter: none !important;
+}
+
+body.is-dark-mode .results-toolbar .results-history-btn:disabled,
+body.is-dark-mode .results-toolbar .results-cancel-btn:disabled,
+body.is-dark-mode .results-toolbar .results-manual-btn:disabled,
+body.is-dark-mode .results-toolbar .results-advanced-btn:disabled {
+  border-color: rgba(148, 163, 184, 0.16) !important;
+  background: rgba(15, 23, 42, 0.42) !important;
+  color: #64748B !important;
+  opacity: 1 !important;
+}
+
+@media (min-width: 1450px) {
+  .results-toolbar .results-search-group {
+    grid-template-columns: minmax(170px, 1fr) 140px calc(6cm - 16px) 270px 128px !important;
+    gap: 8px !important;
+  }
+
+  .results-toolbar .results-search-group > .search-input {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+  }
+
+  .results-toolbar .results-search-group > .results-history-actions {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    gap: 6px !important;
+  }
+
+  .results-toolbar .results-search-group > .results-status-actions {
+    grid-column: 4 !important;
+    grid-row: 1 !important;
+    width: 100% !important;
+    justify-self: stretch !important;
+    gap: 6px !important;
+  }
+
+  .results-toolbar .results-search-group > #advancedFiltersBtn {
+    grid-column: 5 !important;
+    grid-row: 1 !important;
+  }
+}
