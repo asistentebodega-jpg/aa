@@ -3835,6 +3835,43 @@ body.is-dark-mode .drive-user-action-row .drive-picker-control select {
   background: rgba(198,40,40,0.12);
   animation: ds-pulse 1s ease-in-out infinite;
 }
+
+#drive-token-clock,
+.ds-token-clock {
+  color: #34F39A !important;
+  background: rgba(52, 243, 154, 0.18) !important;
+  border: 1px solid rgba(52, 243, 154, 0.58) !important;
+  box-shadow:
+    0 0 0 1px rgba(52, 243, 154, 0.10),
+    0 0 18px rgba(52, 243, 154, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16) !important;
+  text-shadow: 0 0 10px rgba(167, 243, 208, 0.82) !important;
+  font-weight: 950 !important;
+}
+
+#drive-token-clock.ds-token-clock--warning,
+.ds-token-clock.ds-token-clock--warning {
+  color: #FCD34D !important;
+  background: rgba(251, 191, 36, 0.20) !important;
+  border-color: rgba(251, 191, 36, 0.60) !important;
+  box-shadow:
+    0 0 0 1px rgba(251, 191, 36, 0.10),
+    0 0 18px rgba(251, 191, 36, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16) !important;
+  text-shadow: 0 0 10px rgba(252, 211, 77, 0.72) !important;
+}
+
+#drive-token-clock.ds-token-clock--critical,
+.ds-token-clock.ds-token-clock--critical {
+  color: #FDA4AF !important;
+  background: rgba(244, 63, 94, 0.22) !important;
+  border-color: rgba(251, 113, 133, 0.64) !important;
+  box-shadow:
+    0 0 0 1px rgba(251, 113, 133, 0.12),
+    0 0 20px rgba(244, 63, 94, 0.48),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16) !important;
+  text-shadow: 0 0 10px rgba(253, 164, 175, 0.78) !important;
+}
 @keyframes ds-pulse {
   0%, 100% { opacity: 1; }
   50%       { opacity: 0.5; }
