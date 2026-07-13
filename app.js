@@ -57,6 +57,7 @@
             showStoredBtn: document.getElementById('showStoredBtn'),
             clearStoredBtn: document.getElementById('clearStoredBtn'),
             cancelOrderBtn: document.getElementById('cancelOrderBtn'),
+            processManualBtn: document.getElementById('processManualBtn'),
             savePortableBtn: document.getElementById('savePortableBtn'),
             messageStack: document.getElementById('messageStack'),
             orderLookupFileInput: document.getElementById('orderLookupFileInput'),
@@ -112,6 +113,7 @@
                 DOWNLOADS_HELPER_TOKEN_KEY: 'novapet_downloads_helper_token_v1',
                 DOWNLOADS_HELPER_TOKEN_HEADER: 'X-NovaPet-Helper-Token',
                 DOWNLOADS_HELPER_DEFAULT_TOKEN: 'novapet-downloads-helper-v1',
+                MANUAL_PROCESSED_STATUS: 'PROCESADO MANUAL',
                 SHEETJS_SCRIPT_SRC: 'xlsx.full.min.js',
                 SHEETJS_FALLBACK_SCRIPT_SRCS: Object.freeze([
                     'xlsx.full.min.js',
@@ -1060,7 +1062,7 @@
                         App.ui.showMessage(
                             'No fue posible guardar el estado manual del pedido.',
                             'error',
-                            { title: 'Pedido cancelado' }
+                            { title: 'Estado manual' }
                         );
                         return false;
                     }
@@ -2663,6 +2665,8 @@
                             ? 'is-nd'
                             : App.table.isCancelledStatus(normalizedValue)
                                 ? 'is-cancelled'
+                            : App.table.isManualProcessedStatus(normalizedValue)
+                                ? 'is-manual-processed'
                             : normalizedValue === 'Sin estado'
                                 ? 'is-empty'
                                 : '';
@@ -2716,8 +2720,9 @@
                         || row.numero
                     );
 
-                    if (referenceNumber && App.table.isManualOrderCancelled(referenceNumber)) {
-                        return 'PEDIDO CANCELADO';
+                    const manualStatus = App.table.getManualOrderStatus(referenceNumber);
+                    if (manualStatus) {
+                        return manualStatus;
                     }
 
                     return App.helpers.normalizeComparable(row.estado) || 'Sin estado';
@@ -4149,6 +4154,11 @@
                     return key.includes('CANCEL') || key.includes('ANUL');
                 },
 
+                isManualProcessedStatus(status) {
+                    const key = App.helpers.normalizeHeaderKey(status);
+                    return key === App.helpers.normalizeHeaderKey(App.config.MANUAL_PROCESSED_STATUS);
+                },
+
                 isNdStatus(status) {
                     const key = App.helpers.normalizeHeaderKey(status);
                     return !key || key === 'ND' || key === 'SINESTADO' || key === 'SINDEFINIR';
@@ -4184,6 +4194,10 @@
                     const key = App.helpers.normalizeHeaderKey(status);
                     if (App.table.isCancelledStatus(status)) {
                         return 'is-cancelled';
+                    }
+
+                    if (App.table.isManualProcessedStatus(status)) {
+                        return 'is-manual-processed';
                     }
 
                     if (App.table.isNdStatus(status)) {
@@ -4255,6 +4269,10 @@
                         return 'Cancelado / Anulado';
                     }
 
+                    if (App.table.isManualProcessedStatus(normalizedStatus)) {
+                        return 'Procesado manual';
+                    }
+
                     const knownLabels = {
                         GESTIONDERUTA: 'Gestion de ruta',
                         PENDIENTE: 'Pendiente',
@@ -4290,6 +4308,10 @@
 
                     if (App.table.isNdStatus(item.filter)) {
                         return 'N';
+                    }
+
+                    if (App.table.isManualProcessedStatus(item.filter)) {
+                        return 'PM';
                     }
 
                     const words = String(item.label || '')
@@ -4339,7 +4361,8 @@
                         ['ND', 2],
                         ['__CANCELLED__', 3],
                         ['PENDIENTE', 4],
-                        ['ENPROCESO', 5]
+                        ['ENPROCESO', 5],
+                        ['PROCESADOMANUAL', 6]
                     ]);
                     const defaultStatusItems = [
                         {
@@ -4534,6 +4557,14 @@
                 },
 
                 setStatusSummaryFilter(nextStatus) {
+                    try {
+                        if (typeof DriveSync !== 'undefined' && DriveSync?.showLabelSource) {
+                            DriveSync.showLabelSource('mercadolibre');
+                        }
+                    } catch (error) {
+                        console.warn('[App] No se pudo volver a Mercado Libre:', error);
+                    }
+
                     App.state.activeRowTypeFilter = 'all';
                     App.table.setStatusFilter(nextStatus);
                 },
@@ -4756,6 +4787,9 @@
                     if (App.dom.cancelOrderBtn) {
                         App.dom.cancelOrderBtn.disabled = selectedRows.length === 0;
                     }
+                    if (App.dom.processManualBtn) {
+                        App.dom.processManualBtn.disabled = selectedRows.length === 0;
+                    }
 
                     if (selectedRows.length === 0) {
                         App.dom.selectedInfo.textContent = App.defaults.selectionMessage;
@@ -4871,6 +4905,80 @@
                     }
 
                     App.ui.showMessage(`${parts.join(' y ')}.`, 'success', { title: 'Pedido cancelado' });
+                },
+
+                markSelectedRowsAsProcessedManual() {
+                    const selectedRows = App.table.getRowsSelectedForStatusAction();
+                    if (selectedRows.length === 0) {
+                        App.ui.showMessage(
+                            'Selecciona uno o mas pedidos para marcarlos como procesados manualmente.',
+                            'warning',
+                            { title: 'Procesado manual' }
+                        );
+                        return;
+                    }
+
+                    const nextStatuses = { ...App.state.manualOrderStatuses };
+                    const updatedAt = new Date().toISOString();
+                    const processedOrders = new Set();
+                    let processedManualCount = 0;
+                    let restoredCount = 0;
+
+                    selectedRows.forEach(row => {
+                        const orderNumber = App.helpers.normalizeComparable(row?.numero);
+                        if (!orderNumber || processedOrders.has(orderNumber)) {
+                            return;
+                        }
+                        processedOrders.add(orderNumber);
+
+                        const currentStatus = App.table.getOrderStatusForRow(row);
+                        if (App.table.isManualProcessedStatus(currentStatus)) {
+                            const originalStatus = App.table.getOrderStatusForRow(row, { ignoreManual: true });
+                            if (App.table.isManualProcessedStatus(originalStatus)) {
+                                nextStatuses[orderNumber] = {
+                                    status: 'N/D',
+                                    updatedAt
+                                };
+                            } else {
+                                delete nextStatuses[orderNumber];
+                            }
+                            restoredCount += 1;
+                        } else {
+                            nextStatuses[orderNumber] = {
+                                status: App.config.MANUAL_PROCESSED_STATUS,
+                                updatedAt
+                            };
+                            processedManualCount += 1;
+                        }
+                    });
+
+                    if (processedManualCount === 0 && restoredCount === 0) {
+                        App.ui.showMessage(
+                            'No se encontraron numeros validos para actualizar.',
+                            'warning',
+                            { title: 'Procesado manual' }
+                        );
+                        return;
+                    }
+
+                    if (!App.storage.persistManualOrderStatuses(nextStatuses)) {
+                        return;
+                    }
+
+                    App.table.renderCurrentResults();
+                    if (App.state.orderLookupRows.length > 0) {
+                        App.orderLookup.applyFilters({ showWarningOnEmptySource: false });
+                    }
+
+                    const parts = [];
+                    if (processedManualCount > 0) {
+                        parts.push(`${processedManualCount} pedido(s) marcado(s) como ${App.config.MANUAL_PROCESSED_STATUS}`);
+                    }
+                    if (restoredCount > 0) {
+                        parts.push(`${restoredCount} pedido(s) restaurado(s)`);
+                    }
+
+                    App.ui.showMessage(`${parts.join(' y ')}.`, 'success', { title: 'Procesado manual' });
                 },
 
                 renderResults(rows, metaMessage) {
@@ -5022,6 +5130,9 @@
                     App.dom.printZebraBtn.disabled = App.state.extractedRows.length === 0 && App.state.selectedRowsById.size === 0;
                     if (App.dom.cancelOrderBtn) {
                         App.dom.cancelOrderBtn.disabled = App.state.selectedRowsById.size === 0;
+                    }
+                    if (App.dom.processManualBtn) {
+                        App.dom.processManualBtn.disabled = App.state.selectedRowsById.size === 0;
                     }
                     App.dom.downloadBtn.innerHTML = emptyState
                         ? 'No se encontraron numeros'
@@ -5871,6 +5982,7 @@
                     App.dom.showStoredBtn.addEventListener('click', App.table.handleShowStoredAction);
                     App.dom.clearStoredBtn.addEventListener('click', App.actions.clearStoredHistory);
                     App.dom.cancelOrderBtn?.addEventListener('click', App.table.markSelectedRowsAsCancelled);
+                    App.dom.processManualBtn?.addEventListener('click', App.table.markSelectedRowsAsProcessedManual);
                     App.dom.savePortableBtn.addEventListener('click', App.actions.handlePortableSave);
 
                     App.storage.switchHistoryTab('historial');

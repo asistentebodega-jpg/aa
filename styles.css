@@ -91,29 +91,23 @@
         }
 
         header {
-            text-align: center;
             width: 100%;
             max-width: 860px;
             margin: 0 auto;
             display: grid;
-            justify-items: center;
-            gap: var(--space-3);
+            justify-items: start;
+            gap: 0.1rem;
         }
 
         header h1 {
-            font-size: 2.5rem;
+            font-size: 0.7rem;
             color: var(--primary);
             margin: 0;
-            font-weight: 700;
+            font-weight: 900;
             text-transform: uppercase;
-            letter-spacing: -0.5px;
-        }
-
-        header p {
-            color: var(--text-muted);
-            font-size: 1.1rem;
-            max-width: 640px;
-            margin: 0;
+            letter-spacing: 0.08em;
+            width: 188px;
+            text-align: center;
         }
 
         .app-logo {
@@ -1673,7 +1667,16 @@
             color: var(--text-muted);
         }
 
+        .carrier-label-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.45rem;
+            flex-wrap: wrap;
+        }
+
         .carrier-refresh-btn,
+        .carrier-print-all-btn,
         .carrier-preview-btn,
         .carrier-open-btn {
             appearance: none;
@@ -1690,6 +1693,15 @@
         .carrier-refresh-btn {
             width: 96px;
             height: 30px;
+        }
+
+        .carrier-print-all-btn {
+            min-width: 118px;
+            height: 30px;
+            padding: 0 0.8rem;
+            border-color: #050505;
+            background: #050505;
+            color: #fff;
         }
 
         .carrier-open-btn {
@@ -1720,9 +1732,16 @@
             background: rgba(0, 179, 77, 0.06);
         }
 
+        .carrier-print-all-btn:hover:not(:disabled) {
+            border-color: var(--primary-dark);
+            background: var(--primary-dark);
+            color: #fff;
+        }
+
+        .carrier-print-all-btn:disabled,
         .carrier-preview-btn:disabled,
         .carrier-open-btn:disabled {
-            cursor: wait;
+            cursor: not-allowed;
             opacity: 0.58;
         }
 
@@ -2336,6 +2355,18 @@
             color: #F4F8FF;
         }
 
+        body.is-dark-mode .carrier-print-all-btn {
+            background: #15C978;
+            border-color: #15C978;
+            color: #06140D;
+        }
+
+        body.is-dark-mode .carrier-print-all-btn:hover:not(:disabled) {
+            background: #34D399;
+            border-color: #34D399;
+            color: #06140D;
+        }
+
         body.is-dark-mode .pdf-label-head strong,
         body.is-dark-mode .pdf-label-meta strong,
         body.is-dark-mode .pdf-label-width-control input {
@@ -2691,18 +2722,10 @@
             header h1 {
                 grid-area: title;
                 margin: 0;
-                font-size: 1.78rem;
+                font-size: 0.7rem;
                 line-height: 1.02;
                 justify-self: start;
-            }
-
-            header p {
-                grid-area: subtitle;
-                margin: 0;
-                max-width: none;
-                font-size: 0.88rem;
-                line-height: 1.16;
-                justify-self: start;
+                letter-spacing: 0.08em;
             }
 
             .message-stack {
@@ -3407,6 +3430,7 @@ body.is-dark-mode .ds-ep-summary {
 /* Botones superiores: colores mas vivos en modo oscuro */
 body.is-dark-mode .results-search-group .results-history-btn,
 body.is-dark-mode .results-search-group .results-cancel-btn,
+body.is-dark-mode .results-search-group .results-manual-btn,
 body.is-dark-mode .results-search-group .results-watch-btn,
 body.is-dark-mode .results-search-group .results-advanced-btn {
   opacity: 1 !important;
@@ -3435,8 +3459,14 @@ body.is-dark-mode #cancelOrderBtn {
   color: #FFE4E6 !important;
 }
 
+body.is-dark-mode #processManualBtn {
+  background: linear-gradient(180deg, #155E49 0%, #0F3D32 100%) !important;
+  border-color: #34D399 !important;
+  color: #D1FAE5 !important;
+}
+
 .results-search-group {
-  grid-template-columns: minmax(0, 1fr) 160px 10cm 154px 154px !important;
+  grid-template-columns: minmax(0, 1fr) 160px minmax(260px, 10cm) 154px !important;
 }
 
 .results-search-group > .search-input {
@@ -3447,17 +3477,53 @@ body.is-dark-mode #cancelOrderBtn {
   grid-column: 2 !important;
 }
 
-.results-search-group > #cancelOrderBtn {
-  grid-column: 4 !important;
+.results-search-group > .results-status-actions {
+  grid-column: 3 !important;
 }
 
 .results-search-group > #advancedFiltersBtn {
-  grid-column: 5 !important;
+  grid-column: 4 !important;
 }
 
-#cancelOrderBtn {
+.results-status-actions {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+  min-width: 0 !important;
+}
+
+#cancelOrderBtn,
+#processManualBtn {
   width: 100% !important;
   margin-left: 0 !important;
+}
+
+@media (max-width: 1360px) and (min-width: 901px) {
+  .results-search-group {
+    grid-template-columns: minmax(220px, 1fr) 160px 154px !important;
+  }
+
+  .results-search-group > .search-input {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+  }
+
+  .results-search-group > .results-history-actions {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+  }
+
+  .results-search-group > #advancedFiltersBtn {
+    grid-column: 3 !important;
+    grid-row: 1 !important;
+  }
+
+  .results-search-group > .results-status-actions {
+    grid-column: 1 / -1 !important;
+    grid-row: 2 !important;
+    width: min(100%, 380px) !important;
+    justify-self: end !important;
+  }
 }
 
 @media (max-width: 900px) {
@@ -3467,9 +3533,21 @@ body.is-dark-mode #cancelOrderBtn {
 
   .results-search-group > .search-input,
   .results-search-group > .results-history-actions,
-  .results-search-group > #cancelOrderBtn,
+  .results-search-group > .results-status-actions,
   .results-search-group > #advancedFiltersBtn {
     grid-column: 1 !important;
+    grid-row: auto !important;
+  }
+
+  .results-search-group > .results-status-actions {
+    width: 100% !important;
+    justify-self: stretch !important;
+  }
+}
+
+@media (max-width: 520px) {
+  .results-status-actions {
+    grid-template-columns: 1fr !important;
   }
 }
 
@@ -3495,6 +3573,7 @@ body.is-dark-mode .results-advanced-btn svg {
 body.is-dark-mode #showStoredBtn:hover:not(:disabled),
 body.is-dark-mode #clearStoredBtn:hover:not(:disabled),
 body.is-dark-mode #cancelOrderBtn:hover:not(:disabled),
+body.is-dark-mode #processManualBtn:hover:not(:disabled),
 body.is-dark-mode #downloadsWatchBtn:hover:not(:disabled),
 body.is-dark-mode #advancedFiltersBtn:hover:not(:disabled) {
   filter: brightness(1.12) saturate(1.08) !important;
@@ -3504,6 +3583,7 @@ body.is-dark-mode #advancedFiltersBtn:hover:not(:disabled) {
 body.is-dark-mode #showStoredBtn:disabled,
 body.is-dark-mode #clearStoredBtn:disabled,
 body.is-dark-mode #cancelOrderBtn:disabled,
+body.is-dark-mode #processManualBtn:disabled,
 body.is-dark-mode #downloadsWatchBtn:disabled,
 body.is-dark-mode #advancedFiltersBtn:disabled {
   opacity: 0.84 !important;
@@ -3520,6 +3600,12 @@ body.is-dark-mode #cancelOrderBtn:disabled {
   background: rgba(244, 63, 94, 0.18) !important;
   border-color: rgba(251, 113, 133, 0.48) !important;
   color: #FECDD3 !important;
+}
+
+body.is-dark-mode #processManualBtn:disabled {
+  background: rgba(16, 185, 129, 0.14) !important;
+  border-color: rgba(52, 211, 153, 0.40) !important;
+  color: #A7F3D0 !important;
 }
 
 /* Panel seleccionable de estados de pedidos */
@@ -3731,6 +3817,11 @@ body.is-dark-mode #cancelOrderBtn:disabled {
 
 .status-summary-option.is-total .status-summary-icon,
 .status-summary-option.is-complete .status-summary-icon {
+  background: #DDFBEA;
+  color: #008A3B;
+}
+
+.status-summary-option.is-manual-processed .status-summary-icon {
   background: #DDFBEA;
   color: #008A3B;
 }

@@ -936,6 +936,7 @@ function _renderCarrierPanel() {
     const summary = document.getElementById('carrierLabelsSummary');
     const body = document.getElementById('carrierLabelsBody');
     const meta = document.getElementById('resultsMeta');
+    const printAllBtn = document.getElementById('carrierPrintAllBtn');
 
     if (title) title.textContent = `Etiquetas ${source.label}`;
     if (summary) {
@@ -947,6 +948,13 @@ function _renderCarrierPanel() {
         meta.textContent = files.length
             ? `Mostrando ${files.length} etiqueta(s) PDF de ${source.label}.`
             : `No hay etiquetas PDF de ${source.label} para mostrar.`;
+    }
+    if (printAllBtn) {
+        printAllBtn.disabled = files.length === 0;
+        printAllBtn.dataset.carrierPrintAllSource = active;
+        printAllBtn.title = files.length
+            ? `Imprimir ${files.length} etiqueta(s) PDF de ${source.label}`
+            : `No hay etiquetas PDF de ${source.label} para imprimir`;
     }
     if (!body) return;
 
@@ -1002,6 +1010,67 @@ function _setActiveLabelSource(sourceKey) {
 
     if (source.key !== 'mercadolibre' && _state.isPolling && _getActiveCarrierFiles(source.key).length === 0) {
         _refreshCarrierLabels(true);
+    }
+}
+
+async function _printAllCarrierFilesToZebra(sourceKey, button) {
+    const source = _getSourceConfig(sourceKey || _state.activeLabelSource);
+    const files = _getActiveCarrierFiles(source.key);
+
+    if (!PDF_LABEL_SOURCE_KEYS.includes(source.key)) {
+        _setToast('Selecciona Bluexpress o Walmart para imprimir etiquetas PDF.', false);
+        return;
+    }
+    if (!files.length) {
+        _setToast(`No hay etiquetas PDF de ${source.label} para imprimir.`, false);
+        return;
+    }
+
+    const app = window.App;
+    if (!app?.pdfLabels?.printPdfBlob) {
+        _setToast('El impresor PDF Zebra no esta disponible. Recarga la pagina.', false);
+        return;
+    }
+
+    const originalText = button?.textContent || 'Imprimir todo';
+    if (button) {
+        button.disabled = true;
+        button.textContent = `0/${files.length}`;
+    }
+
+    let printed = 0;
+    try {
+        for (let index = 0; index < files.length; index += 1) {
+            const file = files[index];
+            const entry = {
+                sourceKey: source.key,
+                id: file.id,
+                name: file.name || `Etiqueta ${source.label}`,
+            };
+
+            if (button?.isConnected) button.textContent = `${index + 1}/${files.length}`;
+            _setToast(`Imprimiendo ${index + 1}/${files.length}: ${entry.name}`);
+
+            const blob = await _downloadDriveBlob(file.id, 'application/pdf');
+            await app.pdfLabels.printPdfBlob(blob, entry.name, {
+                onProgress: message => _setToast(`${index + 1}/${files.length}: ${message}`)
+            });
+
+            _markCarrierPrinted(entry);
+            printed += 1;
+        }
+
+        _renderCarrierPanel();
+        _setToast(`${printed} etiqueta(s) de ${source.label} enviada(s) a Zebra.`);
+    } catch (err) {
+        console.warn('[DriveSync] printAllCarrierFilesToZebra:', err);
+        _renderCarrierPanel();
+        _setToast(`Se imprimieron ${printed} de ${files.length}. ${err?.message || 'No se pudo completar la impresion masiva.'}`, false);
+    } finally {
+        if (button?.isConnected) {
+            button.disabled = files.length === 0;
+            button.textContent = originalText;
+        }
     }
 }
 
@@ -1490,6 +1559,10 @@ function _initCarrierLabelsUi() {
 
     const refreshBtn = document.getElementById('carrierLabelsRefreshBtn');
     refreshBtn?.addEventListener('click', () => _refreshCarrierLabels(false));
+    const printAllBtn = document.getElementById('carrierPrintAllBtn');
+    printAllBtn?.addEventListener('click', () => {
+        _printAllCarrierFilesToZebra(printAllBtn.dataset.carrierPrintAllSource || _state.activeLabelSource, printAllBtn);
+    });
 
     _updateCarrierStats();
     _renderCarrierPanel();
