@@ -1074,7 +1074,8 @@
                         return [];
                     }
 
-                    const seen = new Set();
+                    const seenDocuments = new Set();
+                    const seenOrders = new Set();
 
                     return [...documents]
                         .filter(documentItem => documentItem && Array.isArray(documentItem.rows))
@@ -1088,12 +1089,36 @@
                                 || documentItem.id
                                 || `${documentItem.sourceName || 'sin-nombre'}-${documentItem.storedAt || ''}-${documentItem.rows.length}`;
 
-                            if (seen.has(key)) {
+                            if (seenDocuments.has(key)) {
                                 return false;
                             }
 
-                            seen.add(key);
+                            seenDocuments.add(key);
                             return true;
+                        })
+                        .map(documentItem => {
+                            const uniqueRows = documentItem.rows.filter(row => {
+                                const orderKey = App.helpers.normalizeComparable(row?.numero);
+                                if (!orderKey) {
+                                    return true;
+                                }
+
+                                if (seenOrders.has(orderKey)) {
+                                    return false;
+                                }
+
+                                seenOrders.add(orderKey);
+                                return true;
+                            });
+
+                            return {
+                                ...documentItem,
+                                rows: uniqueRows,
+                                fingerprint: App.parser.buildDocumentFingerprint(uniqueRows)
+                            };
+                        })
+                        .filter(documentItem => {
+                            return documentItem.rows.length > 0;
                         });
                 },
 
@@ -4076,6 +4101,29 @@
                         .filter(Boolean);
                 },
 
+                getRowOrderKey(row, fallback = '') {
+                    const orderNumber = App.helpers.normalizeComparable(row?.numero);
+                    if (orderNumber) {
+                        return `pedido:${orderNumber}`;
+                    }
+
+                    return `fila:${row?.viewId || row?.documentId || row?.zpl || fallback}`;
+                },
+
+                dedupeRowsByOrder(rows) {
+                    const seen = new Set();
+
+                    return (Array.isArray(rows) ? rows : []).filter((row, index) => {
+                        const key = App.table.getRowOrderKey(row, index);
+                        if (seen.has(key)) {
+                            return false;
+                        }
+
+                        seen.add(key);
+                        return true;
+                    });
+                },
+
                 getRowsSelectedForStatusAction() {
                     const rowsByKey = new Map();
                     const addRow = row => {
@@ -4120,17 +4168,8 @@
                         ...App.state.activeBaseRows,
                         ...App.table.flattenDocumentRows(App.state.storedDocuments)
                     ];
-                    const seen = new Set();
 
-                    return combinedRows.filter(row => {
-                        const key = `${row.documentId || 'sin-doc'}-${row.numero}-${row.zpl}`;
-                        if (seen.has(key)) {
-                            return false;
-                        }
-
-                        seen.add(key);
-                        return true;
-                    });
+                    return App.table.dedupeRowsByOrder(combinedRows);
                 },
 
                 normalizeRowTypeFilter(filter) {
@@ -4983,7 +5022,7 @@
                 },
 
                 renderResults(rows, metaMessage) {
-                    App.state.currentResultRows = Array.isArray(rows) ? [...rows] : [];
+                    App.state.currentResultRows = App.table.dedupeRowsByOrder(rows);
                     App.state.currentResultMessage = metaMessage || '';
                     App.table.renderCurrentResults();
                 },
