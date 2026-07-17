@@ -3866,14 +3866,14 @@ body.is-dark-mode .drive-user-action-row .drive-picker-control select {
 
 body.is-dark-mode #drive-token-clock,
 body.is-dark-mode .ds-token-clock {
-  color: #34F39A !important;
-  background: rgba(52, 243, 154, 0.18) !important;
-  border: 1px solid rgba(52, 243, 154, 0.58) !important;
+  color: #A7F3D0 !important;
+  background: rgba(16, 185, 129, 0.14) !important;
+  border: 1px solid rgba(52, 211, 153, 0.54) !important;
   box-shadow:
-    0 0 0 1px rgba(52, 243, 154, 0.10),
-    0 0 18px rgba(52, 243, 154, 0.42),
-    inset 0 1px 0 rgba(255, 255, 255, 0.16) !important;
-  text-shadow: 0 0 10px rgba(167, 243, 208, 0.82) !important;
+    0 0 0 1px rgba(16, 185, 129, 0.08),
+    0 0 12px rgba(16, 185, 129, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+  text-shadow: 0 0 7px rgba(52, 211, 153, 0.62) !important;
   font-weight: 950 !important;
 }
 
